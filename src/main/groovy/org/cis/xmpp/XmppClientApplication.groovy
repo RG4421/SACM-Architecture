@@ -190,7 +190,7 @@ class XmppClientApplication {
 					Message.Type.CHAT,
 					chat.msg)
 			)
-			xmppClient.query(IQ.get(ServiceDiscoveryManager.g))
+			//xmppClient.query(IQ.get(ServiceDiscoveryManager.g))
 		} else {
 			println getStatus()
 			throw new XmppConnectionInvalidException("XMPP Session Invalid")
