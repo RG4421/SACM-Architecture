@@ -3,12 +3,23 @@ package org.cis.xmpp
 import org.cis.xmpp.exc.XmppConnectionInvalidCredentialsException
 import rocks.xmpp.core.sasl.AuthenticationException
 import rocks.xmpp.core.session.XmppSession
+import spock.lang.Shared
 import spock.lang.Specification
 
 class XmppClientApplicationTest extends Specification {
+	@Shared
+	XmppProxy app
+
+	def setup() {
+		app = new XmppProxy(xmppDomain: "ip-0a1e0af4")
+	}
+
+	def cleanup() {
+		app.close()
+	}
+
 	def "Connect"() {
 		given: "the application"
-			def app = new XmppClientApplication()
 		when: "connection information is supplied"
 			Properties properties = new Properties()
 			properties.load(getClass().getResourceAsStream("/test-conn.properties"))
@@ -21,7 +32,6 @@ class XmppClientApplicationTest extends Specification {
 
 	def "Connect Exception on bad Creds"() {
 		given: "the application"
-			def app = new XmppClientApplication()
 		when: "connection information is supplied"
 			def u = new User(username: "nobody", password: "blerg")
 			app.connect(u)
@@ -31,7 +41,6 @@ class XmppClientApplicationTest extends Specification {
 
 	def "Exception on missing Creds"() {
 		given: "the application"
-			def app = new XmppClientApplication()
 		when: "connection information is supplied"
 			def u = new User(username: "nobody")
 			app.connect(u)

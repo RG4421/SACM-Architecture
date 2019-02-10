@@ -118,6 +118,15 @@
         <xsd:annotation>
             <xsd:documentation></xsd:documentation>
         </xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="sacm:collection-filter" minOccurs="1" maxOccurs="unbounded">
+                    <xsd:annotation>
+                        <xsd:documentation></xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
     </xsd:element>
     
     <xsd:element name="collection-filter">
@@ -140,8 +149,27 @@
         <xsd:annotation>
             <xsd:documentation></xsd:documentation>
         </xsd:annotation>
+        <xsd:complexType>
+            <xsd:choice>
+                <xsd:sequence>
+                    <xsd:element ref="sacm:set" minOccurs="1" maxOccurs="2"/>
+                </xsd:sequence>
+                <xsd:sequence>
+                    <xsd:element ref="sacm:collection-ref" minOccurs="1" maxOccurs="2"/>
+                </xsd:sequence>
+            </xsd:choice>
+            <xsd:attribute name="set-combination" type="sacm:SetCombinationEnumeration" use="optional" default="UNION"/>
+        </xsd:complexType>
     </xsd:element>
     
+    <xsd:element name="collection-ref">
+        <xsd:annotation>
+            <xsd:documentation></xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="collection-idref" type="sacm:CollectionIDPattern"/>
+        </xsd:complexType>
+    </xsd:element>
     
     <!-- =============================================================================== -->
     <!-- ===================================  TYPES  =================================== -->
@@ -165,12 +193,12 @@
                         <xsd:documentation xml:lang="en"></xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="datatype" type="sacm:datatypeType" use="optional">
+                <xsd:attribute name="datatype" type="sacm:DatatypeEnumeration" use="optional">
                     <xsd:annotation>
                         <xsd:documentation xml:lang="en"></xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="operation" type="sacm:operationType" use="optional">
+                <xsd:attribute name="operation" type="sacm:OperationEnumeration" use="optional">
                     <xsd:annotation>
                         <xsd:documentation xml:lang="en"></xsd:documentation>
                     </xsd:annotation>
@@ -437,6 +465,74 @@
             <xsd:enumeration value="include">
                 <xsd:annotation>
                     <xsd:documentation>The include value specifies that only items that match the filter shall be included in the set that the filter is applied to.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="SetCombinationEnumeration">
+        <xsd:annotation>
+            <xsd:documentation>The SetCombinationEnumeration simple type defines acceptable set operations. Set operations are used to take multiple different sets of objects within OVAL and merge them into a single unique set. The different operators that guide this merge are defined below. For each operator, if only a single object has been supplied, then the resulting set is simply that complete object.</xsd:documentation>
+            <xsd:appinfo>
+                <evaluation_documentation>Below are some tables that outline how different flags are combined with a given set_operator to return a new flag. These tables are needed when computing the flag for collected objects that represent object sets in an OVAL Definition. The top row identifies the flag associated with the first set or object reference. The left column identifies the flag associated with the second set or object reference. The matrix inside the table represent the resulting flag when the given set_operator is applied. (E=error, C=complete, I=incomplete, DNE=does not exist, NC=not collected, NA=not applicable)</evaluation_documentation>
+                <evaluation_chart xml:space="preserve">
+                    ||                                   ||
+ set-combination is ||            obj 1 flag             || 
+      union         ||                                   ||
+                    ||  E  |  C  |  I  | DNE | NC  | NA  ||
+--------------------||-----------------------------------||
+                  E ||  E  |  E  |  E  |  E  |  E  |  E  || 
+     obj          C ||  E  |  C  |  I  |  C  |  I  |  C  ||
+      2           I ||  E  |  I  |  I  |  I  |  I  |  I  || 
+     flag       DNE ||  E  |  C  |  I  | DNE |  I  | DNE ||
+                 NC ||  E  |  I  |  I  |  I  |  NC |  NC || 
+                 NA ||  E  |  C  |  I  | DNE |  NC |  NA ||
+--------------------||-----------------------------------||
+                      </evaluation_chart>
+                <evaluation_chart xml:space="preserve">
+                    ||                                   ||
+ set-combination is ||             obj 1 flag            ||
+  intersection      ||                                   ||
+                    ||  E  |  C  |  I  | DNE | NC  | NA  ||
+--------------------||-----------------------------------||
+                  E ||  E  |  E  |  E  | DNE |  E  |  E  ||
+      obj         C ||  E  |  C  |  I  | DNE |  NC |  C  ||
+       2          I ||  E  |  I  |  I  | DNE |  NC |  I  ||
+      flag      DNE || DNE | DNE | DNE | DNE | DNE | DNE ||
+                 NC ||  E  |  NC |  NC | DNE |  NC |  NC ||
+                 NA ||  E  |  C  |  I  | DNE |  NC |  NA ||
+--------------------||-----------------------------------||
+                      </evaluation_chart>
+                <evaluation_chart xml:space="preserve">
+                    ||                                   ||
+ set-combination is ||             obj 1 flag            ||
+     complement     ||                                   ||
+                    ||  E  |  C  |  I  | DNE | NC  | NA  ||
+--------------------||-----------------------------------||
+                  E ||  E  |  E  |  E  | DNE |  E  |  E  ||
+      obj         C ||  E  |  C  |  I  | DNE |  NC |  E  ||
+       2          I ||  E  |  E  |  E  | DNE |  NC |  E  ||
+      flag      DNE ||  E  |  C  |  I  | DNE |  NC |  E  ||
+                 NC ||  E  |  NC |  NC | DNE |  NC |  E  ||
+                 NA ||  E  |  E  |  E  |  E  |  E  |  E  ||
+--------------------||-----------------------------------||
+                      </evaluation_chart>
+            </xsd:appinfo>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="COMPLEMENT">
+                <xsd:annotation>
+                    <xsd:documentation>The complement operator is defined in OVAL as a relative complement. The resulting unique set contains everything that belongs to the first declared set that is not part of the second declared set. If A and B are sets (with A being the first declared set), then the relative complement is the set of elements in A, but not in B, with the duplicates removed.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="INTERSECTION">
+                <xsd:annotation>
+                    <xsd:documentation>The intersection of two sets in OVAL results in a unique set that contains everything that belongs to both sets in the collection, but nothing else. If A and B are sets, then the intersection of A and B contains all the elements of A that also belong to B, but no other elements, with the duplicates removed.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="UNION">
+                <xsd:annotation>
+                    <xsd:documentation>The union of two sets in OVAL results in a unique set that contains everything that belongs to either of the original sets. If A and B are sets, then the union of A and B contains all the elements of A and all elements of B, with the duplicates removed.</xsd:documentation>
                 </xsd:annotation>
             </xsd:enumeration>
         </xsd:restriction>
