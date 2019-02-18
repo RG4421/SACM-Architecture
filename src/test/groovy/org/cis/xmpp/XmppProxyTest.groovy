@@ -1,9 +1,14 @@
 package org.cis.xmpp
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import spock.lang.Shared
 import spock.lang.Specification
 
 class XmppProxyTest extends Specification {
+	@Shared
+	Logger log = LoggerFactory.getLogger("org.cis.xmpp")
+
 	@Shared
 	XmppProxy ubuntu
 	@Shared
@@ -11,10 +16,10 @@ class XmppProxyTest extends Specification {
 
 
 	def ucf = { fm ->
-		println "[UBUNTU CALLBACK FUNCTION] ${fm}${System.lineSeparator()}"
+		log.info "[UBUNTU CALLBACK FUNCTION] ${fm}${System.lineSeparator()}"
 	}
 	def ocf = { fm ->
-		println "[ORCHESTRATOR CALLBACK FUNCTION] ${fm}${System.lineSeparator()}"
+		log.info "[ORCHESTRATOR CALLBACK FUNCTION] ${fm}${System.lineSeparator()}"
 	}
 
 	void setup() {
@@ -32,10 +37,10 @@ class XmppProxyTest extends Specification {
 
 	def "SendMessage"() {
 		given: "A bogus chat message"
-			Chat chat = new Chat(to: "orchestrator", msg: "doesnt matter")
-		when: "The IQ is sent from 'ubuntu' to 'orchestrator'"
+			Chat chat = new Chat(to: "ubuntu", msg: "doesnt matter")
+		when: "The IQ is sent from 'orchestrator' to 'ubuntu'"
 			//Thread.sleep(10000)
-			ubuntu.sendMessage(chat)
+			orchestrator.sendMessage(chat)
 		then: "the callback function is called, setting the var"
 			false
 	}

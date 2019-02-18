@@ -7,4 +7,5 @@ class User {
 	String username
 	String password
 	String domain
+	String resource
 }

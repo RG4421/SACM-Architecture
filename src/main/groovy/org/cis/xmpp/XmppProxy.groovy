@@ -1,10 +1,15 @@
 package org.cis.xmpp
 
-import org.apache.groovy.jaxb.extensions.JaxbExtensions
+import org.cis.xmpp.addition.model.Addition
 import org.cis.xmpp.exc.XmppConnectionInvalidCredentialsException
 import org.cis.xmpp.exc.XmppConnectionInvalidException
+import org.cis.xmpp.svc.AdditionServiceDemo
+import org.cis.xmpp.svc.AssessmentContentService
+import org.cis.xmpp.svc.CollectionsService
 import org.cis.xmpp.trust.TrustAllX509TrustManager
 import org.ietf.sacm.collection.*
+import org.ietf.sacm.list.model.AssessmentContent
+import org.ietf.sacm.list.model.AssessmentContentResource
 import rocks.xmpp.addr.Jid
 import rocks.xmpp.core.net.client.SocketConnectionConfiguration
 import rocks.xmpp.core.session.Extension
@@ -15,14 +20,15 @@ import rocks.xmpp.core.session.debug.ConsoleDebugger
 import rocks.xmpp.core.stanza.IQHandler
 import rocks.xmpp.core.stanza.model.IQ
 import rocks.xmpp.core.stanza.model.Message
-import rocks.xmpp.debug.gui.VisualDebugger
+import rocks.xmpp.core.stanza.model.StanzaError
+import rocks.xmpp.core.stanza.model.StanzaErrorException
+import rocks.xmpp.core.stanza.model.errors.Condition
 import rocks.xmpp.im.roster.RosterManager
 
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSession
 import javax.net.ssl.TrustManager
-import javax.xml.bind.JAXBContext
 import java.security.SecureRandom
 
 class XmppProxy {
@@ -30,6 +36,12 @@ class XmppProxy {
 	String       xmppDomain
 	//SwingBuilder swingBuilder
 	Closure callback
+
+	def iqHandlerServices = [
+		new AssessmentContentService(),
+		new AdditionServiceDemo(),
+		new CollectionsService()
+	]
 
 	/**
 	 *
@@ -42,7 +54,7 @@ class XmppProxy {
 		}
 
 		if (user.username && user.password) {
-			xmppClient.login(user.username, user.password)
+			xmppClient.login(user.username, user.password, user.resource)
 		} else {
 			throw new XmppConnectionInvalidCredentialsException("Invalid XMPP Credentials")
 		}
@@ -66,7 +78,7 @@ class XmppProxy {
 	 */
 	def sendMessage(Chat chat) {
 		if (getStatus() == XmppSession.Status.AUTHENTICATED) {
-			println chat
+//			println chat
 //			xmppClient.sendMessage(
 //				new Message(
 //					Jid.of("${chat.to}@${xmppDomain}"),
@@ -74,9 +86,36 @@ class XmppProxy {
 //					chat.msg)
 //			)
 			Collections sample = createSample()
+			IQ resultIQ0 = xmppClient.query(IQ.get(Jid.of("${chat.to}@${xmppDomain}/resource"), sample)).getResult()
+			callback(resultIQ0.getExtension(Collections.class))
 
-			IQ resultIQ = xmppClient.query(IQ.get(Jid.of("${chat.to}@${xmppDomain}"), sample)).getResult()
-			callback(resultIQ.getExtension(Collections.class))
+			Jid to   = Jid.of("${chat.to}@${xmppDomain}/resource")
+			Jid from = Jid.of("orchestrator@ip-0a1e0af4/resource")
+			AssessmentContent assessmentContent = new AssessmentContent("list")
+			IQ requestIQ = new IQ(
+				to, // to JID
+				IQ.Type.GET,                        // type
+				assessmentContent,                  // extension
+				null,                               // id (null == generate one)
+				from,                               // from JID
+				null,                               // Locale
+				null)                               // StanzaError
+			IQ resultIQ = xmppClient.query(requestIQ).getResult()
+			callback(resultIQ.getExtension(AssessmentContent.class))
+
+			try {
+				Addition addition = new Addition(52, 22)
+
+				// Request the sum of two values (52 + 22). The requester will calculate it for you and return a result.
+				IQ resultIQ2 = xmppClient.query(IQ.get(Jid.of("${chat.to}@${xmppDomain}/resource"), addition)).getResult()
+
+				callback(resultIQ2.getExtension(Addition.class))
+			} catch (StanzaErrorException s) {
+				if (s.getCondition() == Condition.SERVICE_UNAVAILABLE) {
+					def b
+				}
+			}
+
 		} else {
 			println getStatus()
 			throw new XmppConnectionInvalidException("XMPP Session Invalid")
@@ -117,38 +156,41 @@ class XmppProxy {
 
 		// Register the SACM collections
 		XmppSessionConfiguration collectionsConfiguration = XmppSessionConfiguration.builder()
-			.extensions(Extension.of(Collections.class))
+			.extensions(
+				Extension.of(Collections.class),
+				Extension.of(AssessmentContent.class),
+				Extension.of(Addition.class))
 			.debugger(ConsoleDebugger.class)
 			.build()
 
 		xmppClient = XmppClient.create(xmppDomain, collectionsConfiguration, tcpConfiguration)
 
-		xmppClient.addOutboundPresenceListener { e ->
-			println "[OUTBOUND PRESENCE]: ${e.getPresence()}"
-		}
-
-		// Listen for presence changes
-		xmppClient.addInboundPresenceListener { e ->
-			println "[INBOUND PRESENCE]: ${e.getPresence()}"
-//			Presence presence = e.getPresence()
+//		xmppClient.addOutboundPresenceListener { e ->
+//			println "[OUTBOUND PRESENCE]: ${e.getPresence()}"
+//		}
 //
-//			// Deal with Presence updates
-//			Contact contact = xmppClient.getManager(RosterManager.class).getContact(presence.getFrom())
-//			if (contact) {
-//				// contact's presence has updated.
-//			}
-//
-//			// Presence Subscription requests
-//			if (presence.getType() == Presence.Type.SUBSCRIBE) {
-//				// presence.getFrom() wants to subscribe to your presence.
-//
-//				// Approve:
-//				//xmppClient.getManager(PresenceManager.class).approveSubscription(presence.getFrom())
-//
-//				// Deny:
-//				//xmppClient.getManager(PresenceManager.class).denySubscription(presence.getFrom())
-//			}
-		}
+//		// Listen for presence changes
+//		xmppClient.addInboundPresenceListener { e ->
+//			println "[INBOUND PRESENCE]: ${e.getPresence()}"
+////			Presence presence = e.getPresence()
+////
+////			// Deal with Presence updates
+////			Contact contact = xmppClient.getManager(RosterManager.class).getContact(presence.getFrom())
+////			if (contact) {
+////				// contact's presence has updated.
+////			}
+////
+////			// Presence Subscription requests
+////			if (presence.getType() == Presence.Type.SUBSCRIBE) {
+////				// presence.getFrom() wants to subscribe to your presence.
+////
+////				// Approve:
+////				//xmppClient.getManager(PresenceManager.class).approveSubscription(presence.getFrom())
+////
+////				// Deny:
+////				//xmppClient.getManager(PresenceManager.class).denySubscription(presence.getFrom())
+////			}
+//		}
 
 		// Listen for messages
 		xmppClient.addInboundMessageListener { e -> fmt(e) }
@@ -156,31 +198,14 @@ class XmppProxy {
 		// Listen for messages
 		xmppClient.addOutboundMessageListener { e -> fmt(e) }
 
-		// IQ Handler
-		xmppClient.addIQHandler(Collections.class, new IQHandler() {
-			@Override
-			IQ handleRequest(IQ iq) {
-				println "[ADD IQ HANDLER] ${iq}"
-				Collections collections = iq.getExtension(Collections.class)
-				if (collections) {
-					println "Marshalling IQ within 'addIQHandler'"
-					println JaxbExtensions.marshal(JAXBContext.newInstance(Collections.class), collections)
-					return iq.createResult(collections)
-				}
-				return iq.createResult()
-			}
-		})
+		// IQ HANDLERS
+		iqHandlerServices.each { iqh -> iqh.addIQHandler(xmppClient) }
 
+		xmppClient.addOutboundIQListener{ e ->
+			println "[OUTBOUND IQ] ${e.IQ}"
+		}
 		xmppClient.addInboundIQListener { e ->
-			IQ iq = e.getIQ()
-			println iq
-			Collections collections = iq.getExtension(Collections.class)
-			if (collections) {
-				println "Marshalling IQ within 'addInboundIQListener'"
-				println JaxbExtensions.marshal(JAXBContext.newInstance(Collections.class), collections)
-				return iq.createResult(collections)
-			}
-			return iq.createResult()
+			println "[INBOUND IQ] ${e.IQ}"
 		}
 
 		// Listen for roster pushes
@@ -203,6 +228,10 @@ class XmppProxy {
 
 		//swingBuilder."conversation".text += fm + System.lineSeparator()
 		callback(fm)
+	}
+
+	AssessmentContent createAssessmentContentRequest() {
+		return new AssessmentContent()
 	}
 
 	Collections createSample() {

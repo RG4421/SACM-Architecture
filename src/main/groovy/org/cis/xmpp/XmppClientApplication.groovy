@@ -1,5 +1,6 @@
 package org.cis.xmpp
 
+import groovy.beans.Bindable
 import groovy.swing.SwingBuilder
 
 import javax.swing.*
@@ -33,7 +34,7 @@ class XmppClientApplication {
 	 */
 	void start() {
 
-		def chat = new Chat(to: "bill", msg: "")
+		def chat = new Chat(to: "", msg: "")
 		def user = new User(username: "ubuntu", domain: DOMAIN)
 
 		def closeLogon = { t ->
@@ -67,6 +68,11 @@ class XmppClientApplication {
 						td { label "Domain:"}
 						td { textField([id: "fDomain", columns: 15, text: user.domain])}
 					}
+
+					tr {
+						td { label "Resource:"}
+						td { comboBox([id: "fResource", items: ["sacm", "oval", "orchestrator"] ])}
+					}
 				}
 			}
 
@@ -83,7 +89,8 @@ class XmppClientApplication {
 			bean user,
 				username: bind { fUsername.text  },
 				password: bind { fCreds.text },
-				domain: bind { fDomain.text }
+				domain: bind { fDomain.text },
+				resource: bind { fResource.selectedItem }
 		}
 
 		mainFrame = swing.frame(id: "main", title: 'XMPP Chat', size: [650, 500], locationRelativeTo: null,
