@@ -10,21 +10,27 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    mavenLocal()
-    maven { url "https://maven.atlassian.com/3rdparty/" }
-    maven { url "http://repo.enonic.com/public/" }
-    maven { url "http://repo.spring.io/plugins-release/" }
+//    mavenLocal()
+//    maven { url "https://maven.atlassian.com/3rdparty/" }
+//    maven { url "http://repo.enonic.com/public/" }
+//    maven { url "http://repo.spring.io/plugins-release/" }
 }
 
 dependencies {
     // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all
     compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.5.6'
 
+    // https://mvnrepository.com/artifact/rocks.xmpp/xmpp-core
+    compile group: 'rocks.xmpp', name: 'xmpp-core', version: '0.8.0'
+
     // https://mvnrepository.com/artifact/rocks.xmpp/xmpp-core-client
     compile group: 'rocks.xmpp', name: 'xmpp-core-client', version: '0.8.0'
 
     // https://mvnrepository.com/artifact/rocks.xmpp/xmpp-debug
     compile group: 'rocks.xmpp', name: 'xmpp-debug', version: '0.8.0'
+
+    // https://mvnrepository.com/artifact/rocks.xmpp/xmpp-extensions
+    compile group: 'rocks.xmpp', name: 'xmpp-extensions', version: '0.8.0'
 
     // https://mvnrepository.com/artifact/rocks.xmpp/xmpp-extensions-client
     compile group: 'rocks.xmpp', name: 'xmpp-extensions-client', version: '0.8.0'
@@ -38,12 +44,12 @@ dependencies {
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
 
-    compile files('../../../../../groovy-2.5.6/lib/groovy-jaxb-2.5.6.jar')
-    compile files(
-        '../../../../../groovy-2.5.6/lib/extras-jaxb/activation-1.1.1.jar',
-        '../../../../../groovy-2.5.6/lib/extras-jaxb/jaxb-api-2.3.0.jar',
-        '../../../../../groovy-2.5.6/lib/extras-jaxb/jaxb-core-2.3.0.1.jar',
-        '../../../../../groovy-2.5.6/lib/extras-jaxb/jaxb-impl-2.3.0.1.jar')
+//    compile files('../../../../../groovy-2.5.6/lib/groovy-jaxb-2.5.6.jar')
+//    compile files(
+//        '../../../../../groovy-2.5.6/lib/extras-jaxb/activation-1.1.1.jar',
+//        '../../../../../groovy-2.5.6/lib/extras-jaxb/jaxb-api-2.3.0.jar',
+//        '../../../../../groovy-2.5.6/lib/extras-jaxb/jaxb-core-2.3.0.1.jar',
+//        '../../../../../groovy-2.5.6/lib/extras-jaxb/jaxb-impl-2.3.0.1.jar')
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'

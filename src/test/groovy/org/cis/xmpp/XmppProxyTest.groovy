@@ -24,10 +24,10 @@ class XmppProxyTest extends Specification {
 
 	void setup() {
 		ubuntu = new XmppProxy(callback: ucf, xmppDomain: "ip-0a1e0af4")
-		ubuntu.connect(new User(username: "ubuntu", password: "Pt3ttcs2h!"))
+		ubuntu.connect(new User(username: "ubuntu", password: "Pt3ttcs2h!", resource: "resource"))
 
 		orchestrator = new XmppProxy(callback: ocf, xmppDomain: "ip-0a1e0af4")
-		orchestrator.connect(new User(username: "orchestrator", password: "Pt3ttcs2h!"))
+		orchestrator.connect(new User(username: "orchestrator", password: "Pt3ttcs2h!", resource: "resource"))
 	}
 
 	void cleanup() {
