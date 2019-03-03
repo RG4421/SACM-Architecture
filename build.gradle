@@ -44,12 +44,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
 
-//    compile files('../../../../../groovy-2.5.6/lib/groovy-jaxb-2.5.6.jar')
-//    compile files(
-//        '../../../../../groovy-2.5.6/lib/extras-jaxb/activation-1.1.1.jar',
-//        '../../../../../groovy-2.5.6/lib/extras-jaxb/jaxb-api-2.3.0.jar',
-//        '../../../../../groovy-2.5.6/lib/extras-jaxb/jaxb-core-2.3.0.1.jar',
-//        '../../../../../groovy-2.5.6/lib/extras-jaxb/jaxb-impl-2.3.0.1.jar')
+    // https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE
+    compile group: 'net.sf.saxon', name: 'Saxon-HE', version: '9.9.0-2'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'

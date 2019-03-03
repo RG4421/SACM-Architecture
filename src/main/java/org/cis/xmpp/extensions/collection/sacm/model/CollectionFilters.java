@@ -6,7 +6,7 @@
 //
 
 
-package org.ietf.sacm.collection;
+package org.cis.xmpp.extensions.collection.sacm.model;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://cisecurity.org/sacm/sacm-collection}behavior" maxOccurs="unbounded"/>
+ *         &lt;element ref="{http://cisecurity.org/sacm/sacm-collection}collection-filter" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -34,41 +34,41 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "behavior"
+    "collectionFilter"
 })
-@XmlRootElement(name = "collection-behaviors")
-public class CollectionBehaviors {
+@XmlRootElement(name = "collection-filters")
+public class CollectionFilters {
 
-    @XmlElement(required = true)
-    protected List<Behavior> behavior;
+    @XmlElement(name = "collection-filter", required = true)
+    protected List<CollectionFilter> collectionFilter;
 
     /**
-     * Gets the value of the behavior property.
+     * Gets the value of the collectionFilter property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the behavior property.
+     * This is why there is not a <CODE>set</CODE> method for the collectionFilter property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getBehavior().add(newItem);
+     *    getCollectionFilter().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Behavior }
+     * {@link CollectionFilter }
      * 
      * 
      */
-    public List<Behavior> getBehavior() {
-        if (behavior == null) {
-            behavior = new ArrayList<Behavior>();
+    public List<CollectionFilter> getCollectionFilter() {
+        if (collectionFilter == null) {
+            collectionFilter = new ArrayList<CollectionFilter>();
         }
-        return this.behavior;
+        return this.collectionFilter;
     }
 
 }

@@ -3,13 +3,20 @@ package org.cis.xmpp
 import org.cis.xmpp.addition.model.Addition
 import org.cis.xmpp.exc.XmppConnectionInvalidCredentialsException
 import org.cis.xmpp.exc.XmppConnectionInvalidException
+import org.cis.xmpp.extensions.collection.sacm.SacmCollectionManager
+import org.cis.xmpp.extensions.collection.sacm.model.Collection
+import org.cis.xmpp.extensions.collection.sacm.model.CollectionFields
+import org.cis.xmpp.extensions.collection.sacm.model.CollectionType
+import org.cis.xmpp.extensions.collection.sacm.model.Collections
+import org.cis.xmpp.extensions.collection.sacm.model.DatatypeEnumeration
+import org.cis.xmpp.extensions.collection.sacm.model.FamilyEnumeration
+import org.cis.xmpp.extensions.collection.sacm.model.FieldType
+import org.cis.xmpp.extensions.collection.sacm.model.OperationEnumeration
 import org.cis.xmpp.svc.AdditionServiceDemo
 import org.cis.xmpp.svc.AssessmentContentService
 import org.cis.xmpp.svc.CollectionsService
 import org.cis.xmpp.trust.TrustAllX509TrustManager
-import org.ietf.sacm.collection.*
 import org.ietf.sacm.list.model.AssessmentContent
-import org.ietf.sacm.list.model.AssessmentContentResource
 import rocks.xmpp.addr.Jid
 import rocks.xmpp.core.net.client.SocketConnectionConfiguration
 import rocks.xmpp.core.session.Extension
@@ -17,12 +24,14 @@ import rocks.xmpp.core.session.XmppClient
 import rocks.xmpp.core.session.XmppSession
 import rocks.xmpp.core.session.XmppSessionConfiguration
 import rocks.xmpp.core.session.debug.ConsoleDebugger
-import rocks.xmpp.core.stanza.IQHandler
 import rocks.xmpp.core.stanza.model.IQ
 import rocks.xmpp.core.stanza.model.Message
-import rocks.xmpp.core.stanza.model.StanzaError
 import rocks.xmpp.core.stanza.model.StanzaErrorException
 import rocks.xmpp.core.stanza.model.errors.Condition
+import rocks.xmpp.extensions.disco.ServiceDiscoveryManager
+import rocks.xmpp.extensions.disco.model.info.InfoNode
+import rocks.xmpp.extensions.disco.model.items.ItemNode
+import rocks.xmpp.extensions.time.EntityTimeManager
 import rocks.xmpp.im.roster.RosterManager
 
 import javax.net.ssl.HostnameVerifier
@@ -130,6 +139,30 @@ class XmppProxy {
 		return xmppClient ? xmppClient.getStatus() : XmppSession.Status.DISCONNECTED
 	}
 
+	def discoverServices(Jid anotherEntity) {
+		ServiceDiscoveryManager serviceDiscoveryManager = xmppClient.getManager(ServiceDiscoveryManager.class)
+		//serviceDiscoveryManager.addFeature("http://cisecurity.org/sacm/sacm-collection")
+
+		InfoNode infoNode = serviceDiscoveryManager.discoverInformation(anotherEntity).result
+
+		println "---> DISCO#INFO"
+		println "- FEATURES:"
+		infoNode.features.each { f -> println f }
+		println "- IDENTITIES:"
+		infoNode.identities.each { i -> println "${i.name} (${i.type})" }
+		println "- EXTENSIONS:"
+		infoNode.extensions.each { e -> println e.items.collect() }
+
+		//serviceDiscoveryManager.setItemProvider("sacm", ResultSetProvider.forItems([]))
+//		println "DISCO#ITEMS"
+//		ItemNode node = serviceDiscoveryManager.discoverItems(anotherEntity).result
+//		println node.node
+//		node.items.each { i -> println i.name}
+		println "SACM? ${xmppClient.isSupported("http://cisecurity.org/sacm/sacm-collection", anotherEntity).result}"
+
+		xmppClient.getEnabledFeatures().each { f -> println f}
+	}
+
 	/**
 	 *
 	 * @return
@@ -157,7 +190,7 @@ class XmppProxy {
 		// Register the SACM collections
 		XmppSessionConfiguration collectionsConfiguration = XmppSessionConfiguration.builder()
 			.extensions(
-				Extension.of(Collections.class),
+				Extension.of(Collections.NAMESPACE, SacmCollectionManager.class, true, Collections.class), // This includes the extension in a disco#info response
 				Extension.of(AssessmentContent.class),
 				Extension.of(Addition.class))
 			.debugger(ConsoleDebugger.class)
@@ -214,6 +247,8 @@ class XmppProxy {
 		}
 
 		xmppClient.connect()
+
+//		Item
 	}
 
 	/**

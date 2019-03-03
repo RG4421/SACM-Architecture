@@ -1,16 +1,17 @@
 package org.cis.xmpp.svc
 
 import groovy.xml.XmlUtil
-import org.ietf.sacm.collection.Collection
-import org.ietf.sacm.collection.CollectionFields
-import org.ietf.sacm.collection.CollectionRef
-import org.ietf.sacm.collection.CollectionType
-import org.ietf.sacm.collection.Collections
-import org.ietf.sacm.collection.DatatypeEnumeration
-import org.ietf.sacm.collection.FamilyEnumeration
-import org.ietf.sacm.collection.FieldType
-import org.ietf.sacm.collection.OperationEnumeration
-import org.ietf.sacm.collection.SetCombinationEnumeration
+import org.cis.xmpp.extensions.collection.sacm.model.Set
+import org.cis.xmpp.extensions.collection.sacm.model.Collection
+import org.cis.xmpp.extensions.collection.sacm.model.CollectionFields
+import org.cis.xmpp.extensions.collection.sacm.model.CollectionRef
+import org.cis.xmpp.extensions.collection.sacm.model.CollectionType
+import org.cis.xmpp.extensions.collection.sacm.model.Collections
+import org.cis.xmpp.extensions.collection.sacm.model.DatatypeEnumeration
+import org.cis.xmpp.extensions.collection.sacm.model.FamilyEnumeration
+import org.cis.xmpp.extensions.collection.sacm.model.FieldType
+import org.cis.xmpp.extensions.collection.sacm.model.OperationEnumeration
+import org.cis.xmpp.extensions.collection.sacm.model.SetCombinationEnumeration
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -22,7 +23,7 @@ class CollectionsServiceTest extends Specification {
 	@Shared
 	Collections setCollections = new Collections()
 	@Shared
-	def set = new org.ietf.sacm.collection.Set()
+	def set = new Set()
 
 	def setupSpec() {
 

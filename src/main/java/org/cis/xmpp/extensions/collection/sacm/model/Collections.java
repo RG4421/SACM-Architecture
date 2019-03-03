@@ -6,7 +6,7 @@
 //
 
 
-package org.ietf.sacm.collection;
+package org.cis.xmpp.extensions.collection.sacm.model;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://cisecurity.org/sacm/sacm-collection}collection-filter" maxOccurs="unbounded"/>
+ *         &lt;element ref="{http://cisecurity.org/sacm/sacm-collection}collection" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -34,41 +34,42 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "collectionFilter"
+    "collection"
 })
-@XmlRootElement(name = "collection-filters")
-public class CollectionFilters {
+@XmlRootElement(name = "collections")
+public final class Collections {
 
-    @XmlElement(name = "collection-filter", required = true)
-    protected List<CollectionFilter> collectionFilter;
+    public static final String NAMESPACE = "http://cisecurity.org/sacm/sacm-collection";
+
+    @XmlElement(required = true, namespace = Collections.NAMESPACE)
+    protected List<Collection> collection;
 
     /**
-     * Gets the value of the collectionFilter property.
+     * Gets the value of the collection property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the collectionFilter property.
+     * This is why there is not a <CODE>set</CODE> method for the collection property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getCollectionFilter().add(newItem);
+     *    getCollection().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link CollectionFilter }
+     * {@link Collection }
      * 
      * 
      */
-    public List<CollectionFilter> getCollectionFilter() {
-        if (collectionFilter == null) {
-            collectionFilter = new ArrayList<CollectionFilter>();
+    public List<Collection> getCollection() {
+        if (collection == null) {
+            collection = new ArrayList<Collection>();
         }
-        return this.collectionFilter;
+        return this.collection;
     }
-
 }

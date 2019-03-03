@@ -6,7 +6,7 @@
 //
 
 
-package org.ietf.sacm.collection;
+package org.cis.xmpp.extensions.collection.sacm.model;
 
 import javax.xml.bind.annotation.*;
 
@@ -20,8 +20,8 @@ import javax.xml.bind.annotation.*;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="family" use="required" type="{http://cisecurity.org/sacm/sacm-collection}FamilyEnumeration" />
- *       &lt;attribute name="type" use="required" type="{http://cisecurity.org/sacm/sacm-collection}FamilyTypeType" />
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="value" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -31,60 +31,60 @@ import javax.xml.bind.annotation.*;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
-@XmlRootElement(name = "collection-type")
-public class CollectionType {
+@XmlRootElement(name = "behavior")
+public class Behavior {
 
-    @XmlAttribute(name = "family", required = true)
-    protected FamilyEnumeration family;
-    @XmlAttribute(name = "type", required = true)
-    protected String type;
-
-    /**
-     * Gets the value of the family property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link FamilyEnumeration }
-     *     
-     */
-    public FamilyEnumeration getFamily() {
-        return family;
-    }
+    @XmlAttribute(name = "name", required = true)
+    protected String name;
+    @XmlAttribute(name = "value", required = true)
+    protected String value;
 
     /**
-     * Sets the value of the family property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link FamilyEnumeration }
-     *     
-     */
-    public void setFamily(FamilyEnumeration value) {
-        this.family = value;
-    }
-
-    /**
-     * Gets the value of the type property.
+     * Gets the value of the name property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getType() {
-        return type;
+    public String getName() {
+        return name;
     }
 
     /**
-     * Sets the value of the type property.
+     * Sets the value of the name property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setType(String value) {
-        this.type = value;
+    public void setName(String value) {
+        this.name = value;
+    }
+
+    /**
+     * Gets the value of the value property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getValue() {
+        return value;
+    }
+
+    /**
+     * Sets the value of the value property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setValue(String value) {
+        this.value = value;
     }
 
 }

@@ -7,7 +7,7 @@
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @javax.xml.bind.annotation.XmlSchema(namespace = Collections.NAMESPACE, elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package org.ietf.sacm.collection;
+package org.cis.xmpp.extensions.collection.sacm.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

@@ -6,7 +6,7 @@
 //
 
 
-package org.ietf.sacm.collection;
+package org.cis.xmpp.extensions.collection.sacm.model;
 
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;

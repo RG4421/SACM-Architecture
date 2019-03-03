@@ -6,7 +6,7 @@
 //
 
 
-package org.ietf.sacm.collection;
+package org.cis.xmpp.extensions.collection.sacm.model;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://cisecurity.org/sacm/sacm-collection}collection" maxOccurs="unbounded"/>
+ *         &lt;element name="collection-field" type="{http://cisecurity.org/sacm/sacm-collection}FieldType" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -34,42 +34,41 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "collection"
+    "collectionField"
 })
-@XmlRootElement(name = "collections")
-public final class Collections {
+@XmlRootElement(name = "collection-fields")
+public class CollectionFields {
 
-    public static final String NAMESPACE = "http://cisecurity.org/sacm/sacm-collection";
-
-    @XmlElement(required = true, namespace = Collections.NAMESPACE)
-    protected List<Collection> collection;
+    @XmlElement(name = "collection-field", required = true)
+    protected List<FieldType> collectionField;
 
     /**
-     * Gets the value of the collection property.
+     * Gets the value of the collectionField property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the collection property.
+     * This is why there is not a <CODE>set</CODE> method for the collectionField property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getCollection().add(newItem);
+     *    getCollectionField().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Collection }
+     * {@link FieldType }
      * 
      * 
      */
-    public List<Collection> getCollection() {
-        if (collection == null) {
-            collection = new ArrayList<Collection>();
+    public List<FieldType> getCollectionField() {
+        if (collectionField == null) {
+            collectionField = new ArrayList<FieldType>();
         }
-        return this.collection;
+        return this.collectionField;
     }
+
 }

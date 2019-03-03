@@ -6,7 +6,7 @@
 //
 
 
-package org.ietf.sacm.collection;
+package org.cis.xmpp.extensions.collection.sacm.model;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="collection-field" type="{http://cisecurity.org/sacm/sacm-collection}FieldType" maxOccurs="unbounded"/>
+ *         &lt;element ref="{http://cisecurity.org/sacm/sacm-collection}behavior" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -34,41 +34,41 @@ import java.util.List;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "collectionField"
+    "behavior"
 })
-@XmlRootElement(name = "collection-fields")
-public class CollectionFields {
+@XmlRootElement(name = "collection-behaviors")
+public class CollectionBehaviors {
 
-    @XmlElement(name = "collection-field", required = true)
-    protected List<FieldType> collectionField;
+    @XmlElement(required = true)
+    protected List<Behavior> behavior;
 
     /**
-     * Gets the value of the collectionField property.
+     * Gets the value of the behavior property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the collectionField property.
+     * This is why there is not a <CODE>set</CODE> method for the behavior property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getCollectionField().add(newItem);
+     *    getBehavior().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link FieldType }
+     * {@link Behavior }
      * 
      * 
      */
-    public List<FieldType> getCollectionField() {
-        if (collectionField == null) {
-            collectionField = new ArrayList<FieldType>();
+    public List<Behavior> getBehavior() {
+        if (behavior == null) {
+            behavior = new ArrayList<Behavior>();
         }
-        return this.collectionField;
+        return this.behavior;
     }
 
 }

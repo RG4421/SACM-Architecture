@@ -1,7 +1,8 @@
 package org.cis.xmpp.svc
 
 import groovy.xml.StreamingMarkupBuilder
-import org.ietf.sacm.collection.Collections
+import org.cis.xmpp.extensions.collection.sacm.model.Set
+import org.cis.xmpp.extensions.collection.sacm.model.Collections
 import rocks.xmpp.core.session.XmppClient
 import rocks.xmpp.core.stanza.IQHandler
 import rocks.xmpp.core.stanza.model.IQ
@@ -87,7 +88,7 @@ class CollectionsService implements IIQHandlerService {
 	 * @param set
 	 * @return XML serialized to a String
 	 */
-	def setToNode(org.ietf.sacm.collection.Set set) {
+	def setToNode(Set set) {
 		def xml = new StreamingMarkupBuilder().bind { smb ->
 			smb."set" ("set-combination": set.setCombination) {
 				set.set.each { s -> mkp.yieldUnescaped(setToNode(s)) }

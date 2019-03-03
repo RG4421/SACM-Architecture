@@ -2,6 +2,7 @@ package org.cis.xmpp
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import rocks.xmpp.addr.Jid
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -39,8 +40,8 @@ class XmppProxyTest extends Specification {
 		given: "A bogus chat message"
 			Chat chat = new Chat(to: "ubuntu", msg: "doesnt matter")
 		when: "The IQ is sent from 'orchestrator' to 'ubuntu'"
-			//Thread.sleep(10000)
-			orchestrator.sendMessage(chat)
+			Jid u = ubuntu.xmppClient.connectedResource
+			orchestrator.discoverServices(u)
 		then: "the callback function is called, setting the var"
 			false
 	}
