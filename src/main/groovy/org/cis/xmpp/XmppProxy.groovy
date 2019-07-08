@@ -31,14 +31,29 @@ import rocks.xmpp.core.stanza.model.errors.Condition
 import rocks.xmpp.extensions.disco.ServiceDiscoveryManager
 import rocks.xmpp.extensions.disco.model.info.InfoNode
 import rocks.xmpp.extensions.disco.model.items.ItemNode
+import rocks.xmpp.extensions.filetransfer.FileTransfer
+import rocks.xmpp.extensions.filetransfer.FileTransferManager
+import rocks.xmpp.extensions.filetransfer.FileTransferStatusEvent
+import rocks.xmpp.extensions.last.LastActivityManager
+import rocks.xmpp.extensions.last.model.LastActivity
+import rocks.xmpp.extensions.pubsub.PubSubManager
+import rocks.xmpp.extensions.pubsub.PubSubNode
+import rocks.xmpp.extensions.pubsub.PubSubService
+import rocks.xmpp.extensions.pubsub.model.PubSubFeature
 import rocks.xmpp.extensions.time.EntityTimeManager
 import rocks.xmpp.im.roster.RosterManager
+import rocks.xmpp.util.concurrent.AsyncResult
 
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSession
 import javax.net.ssl.TrustManager
+import java.nio.file.Paths
 import java.security.SecureRandom
+import java.time.Duration
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
 
 class XmppProxy {
 	XmppClient   xmppClient
@@ -163,6 +178,35 @@ class XmppProxy {
 		xmppClient.getEnabledFeatures().each { f -> println f}
 	}
 
+	def offerFile(Jid anotherEntity) {
+		println "OFFERING FILE (I AM --> ${xmppClient.connectedResource})"
+		def p = "C:\\_Development\\Projects\\Assessor-Shared\\benchmarks\\Microsoft Windows 10 Release 1709"
+		def n = "${p}\\CIS_Microsoft_Windows_10_Enterprise_Release_1709_Benchmark_v1.4.0-xccdf.xml"
+		//def n = "${p}\\CIS_Microsoft_Windows_10_Enterprise_Release_1709_Benchmark_v1.4.0-cpe-dictionary.xml"
+		def f = new File(n)
+		def d = Duration.ofSeconds(60, 0)
+		FileTransferManager fileTransferManager = xmppClient.getManager(FileTransferManager.class)
+		FileTransfer ft = fileTransferManager.offerFile(f, "Win10", anotherEntity, d).result
+		return ft.transfer()
+	}
+
+	def lastActivity(Jid anotherEntity) {
+		LastActivityManager lastActivityManager = xmppClient.getManager(LastActivityManager.class)
+		LastActivity lastActivity = lastActivityManager.getLastActivity(anotherEntity).getResult()
+		return lastActivity.seconds
+	}
+
+	def createNodes() {
+		PubSubManager pubSubManager = xmppClient.getManager(PubSubManager.class)
+		PubSubService pubSubService = pubSubManager.createPubSubService(Jid.of(xmppClient.connectedResource.domain))
+		//Collection<PubSubFeature> pubSubFeatures = pubSubService.discoverFeatures().result
+		PubSubNode policyNode = pubSubService.node("policy")
+		policyNode.create()
+		PubSubNode actualsNode = pubSubService.node("actuals")
+		actualsNode.create()
+		def b
+	}
+
 	/**
 	 *
 	 * @return
@@ -182,10 +226,10 @@ class XmppProxy {
 			.port(5222)
 			.sslContext(sc)
 			.hostnameVerifier(new HostnameVerifier() {
-			boolean verify(String urlHostName, SSLSession session) {
-				return true
-			}
-		}).build()
+				boolean verify(String urlHostName, SSLSession session) {
+					return true
+				}
+			}).build()
 
 		// Register the SACM collections
 		XmppSessionConfiguration collectionsConfiguration = XmppSessionConfiguration.builder()
@@ -234,16 +278,35 @@ class XmppProxy {
 		// IQ HANDLERS
 		iqHandlerServices.each { iqh -> iqh.addIQHandler(xmppClient) }
 
-		xmppClient.addOutboundIQListener{ e ->
-			println "[OUTBOUND IQ] ${e.IQ}"
-		}
-		xmppClient.addInboundIQListener { e ->
-			println "[INBOUND IQ] ${e.IQ}"
-		}
+//		xmppClient.addOutboundIQListener{ e ->
+//			println "[OUTBOUND IQ] ${e.IQ}"
+//		}
+//		xmppClient.addInboundIQListener { e ->
+//			println "[INBOUND IQ] ${e.IQ}"
+//		}
 
 		// Listen for roster pushes
 		xmppClient.getManager(RosterManager.class).addRosterListener { e ->
 			// Roster has changed
+		}
+
+
+		xmppClient.getManager(FileTransferManager.class).addFileTransferOfferListener { e ->
+			println "ACCEPTING FILE TRANSFER (I AM --> ${xmppClient.connectedResource})"
+			FileTransfer ft = e.accept(Paths.get(e.getName())).result
+
+			println "ADDING FILE TRANSFER STATUS LISTENER"
+			ft.addFileTransferStatusListener { l ->
+				if (l.status == FileTransfer.Status.COMPLETED) { println "${l.status}; ${l.bytesTransferred}" }
+			}
+
+			println "TRANSFERRING"
+			ft.transfer().get(15, TimeUnit.SECONDS)
+
+			println "EXCEPTION?"
+			if (ft.exception) { println ft.exception.localizedMessage }
+
+			println "File Transfer --> Status: ${ft.status}; Bytes: ${ft.bytesTransferred}"
 		}
 
 		xmppClient.connect()

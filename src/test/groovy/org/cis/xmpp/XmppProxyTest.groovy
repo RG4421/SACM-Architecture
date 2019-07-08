@@ -45,4 +45,31 @@ class XmppProxyTest extends Specification {
 		then: "the callback function is called, setting the var"
 			false
 	}
+
+	def "File Transfer"() {
+		given: ""
+		when: "the orchestrator offers a file to ubuntu"
+			Jid u = ubuntu.xmppClient.connectedResource
+			def future = orchestrator.offerFile(u)
+			Thread.sleep(15000)
+		then: "the file is transfered and exists in c-temp"
+			assert new File("C:\\Temp\\Win10-xccdf.xml").exists()
+	}
+
+	def "Last Activity"() {
+		given: ""
+		when: "the orchestrator requests ubuntu's last activity time"
+			Jid u = ubuntu.xmppClient.connectedResource
+			def la = orchestrator.lastActivity(u)
+		then: "a time is returned"
+			assert la
+	}
+
+	def "Create the PubSub Nodes"() {
+		given: ""
+		when: ""
+			orchestrator.createNodes()
+		then: ""
+		true
+	}
 }
