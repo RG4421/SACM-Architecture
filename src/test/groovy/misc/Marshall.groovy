@@ -24,8 +24,8 @@ oo.generator =
 		timestamp: timestamp)
 
 oo.objects = new ObjectsType()
-def fo = new FamilyObject(id: "oval:org.cisecurity:obj:100", version: "1", comment: "Marshalled")
-def eo = new EnvironmentvariableObject(id: "oval:org.cisecurity:obj:101", version: "1", comment: "Marshalled")
+def fo = new FamilyObject(id: "oval:org.cisecurity:obj:100", version: 1, comment: "Marshalled")
+def eo = new EnvironmentvariableObject(id: "oval:org.cisecurity:obj:101", version: 1, comment: "Marshalled")
 eo.name = new ObjectStringType(operation: OperationEnumeration.EQUALS, value: "HOME")
 oo.objects.object << fo
 oo.objects.object << eo
