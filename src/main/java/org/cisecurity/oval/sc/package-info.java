@@ -5,5 +5,14 @@
 // Generated on: 2019.07.16 at 04:00:30 PM EDT 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@javax.xml.bind.annotation.XmlSchema(
+	namespace = "http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6",
+	elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
+	xmlns = {
+		//@XmlNs(prefix="", namespaceURI = "http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6"),
+		@XmlNs(prefix="oval-sc", namespaceURI = "http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6")
+	}
+)
 package org.cisecurity.oval.sc;
+
+import javax.xml.bind.annotation.XmlNs;

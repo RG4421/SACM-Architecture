@@ -5,5 +5,13 @@
 // Generated on: 2019.07.16 at 01:40:47 PM EDT 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://oval.cisecurity.org/XMLSchema/oval-common-6", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@javax.xml.bind.annotation.XmlSchema(
+	namespace = "http://oval.cisecurity.org/XMLSchema/oval-common-6",
+	elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
+	xmlns = {
+		@XmlNs(prefix="oval", namespaceURI = "http://oval.cisecurity.org/XMLSchema/oval-common-6")
+	}
+)
 package org.cisecurity.oval.common;
+
+import javax.xml.bind.annotation.XmlNs;

@@ -246,10 +246,10 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link CollectedItemType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6", name = "collected_item")
-    public JAXBElement<CollectedItemType> createCollectedItem(CollectedItemType value) {
-        return new JAXBElement<CollectedItemType>(_CollectedItem_QNAME, CollectedItemType.class, null, value);
-    }
+//    @XmlElementDecl(namespace = "http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6", name = "collected_item")
+//    public JAXBElement<CollectedItemType> createCollectedItem(CollectedItemType value) {
+//        return new JAXBElement<CollectedItemType>(_CollectedItem_QNAME, CollectedItemType.class, null, value);
+//    }
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link SignatureType }{@code >}}

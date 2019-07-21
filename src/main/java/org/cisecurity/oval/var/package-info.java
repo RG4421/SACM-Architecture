@@ -5,5 +5,14 @@
 // Generated on: 2019.07.16 at 01:40:50 PM EDT 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://oval.cisecurity.org/XMLSchema/oval-variables-6", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+
+@javax.xml.bind.annotation.XmlSchema(
+	namespace = "http://oval.cisecurity.org/XMLSchema/oval-variables-6",
+	elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
+	xmlns = {
+		@XmlNs(prefix="oval-var", namespaceURI = "http://oval.cisecurity.org/XMLSchema/oval-variables-6")
+	}
+)
 package org.cisecurity.oval.var;
+
+import javax.xml.bind.annotation.XmlNs;

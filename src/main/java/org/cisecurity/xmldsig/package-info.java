@@ -5,5 +5,13 @@
 // Generated on: 2019.07.16 at 01:40:46 PM EDT 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.w3.org/2000/09/xmldsig#", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@javax.xml.bind.annotation.XmlSchema(
+	namespace = "http://www.w3.org/2000/09/xmldsig#",
+	elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
+	xmlns = {
+		@XmlNs(prefix="xmldsig", namespaceURI = "http://www.w3.org/2000/09/xmldsig#")
+	}
+)
 package org.cisecurity.xmldsig;
+
+import javax.xml.bind.annotation.XmlNs;

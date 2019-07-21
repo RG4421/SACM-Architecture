@@ -1,5 +1,9 @@
 package org.cisecurity.xmpp
 
+import org.cisecurity.oval.collection.ind.EnvironmentvariableObject
+import org.cisecurity.oval.collection.ind.FamilyObject
+import org.cisecurity.oval.sc.ind.EnvironmentvariableItem
+import org.cisecurity.oval.sc.ind.FamilyItem
 import org.cisecurity.xmpp.exc.XmppConnectionInvalidCredentialsException
 import org.cisecurity.xmpp.exc.XmppConnectionInvalidException
 import org.cisecurity.xmpp.extensions.collection.sacm.model.DatatypeEnumeration
@@ -243,11 +247,15 @@ class XmppProxy {
 		// Register the SACM collections
 		XmppSessionConfiguration collectionsConfiguration = XmppSessionConfiguration.builder()
 			.extensions(
-				Extension.of(Collections.NAMESPACE, SacmCollectionManager.class, true, Collections.class), // This includes the extension in a disco#info response
+				Extension.of("http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6#independent", false, FamilyItem.class, EnvironmentvariableItem.class),
+				Extension.of("http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent", false, FamilyObject.class, EnvironmentvariableObject.class),
+				//Extension.of(Collections.NAMESPACE, SacmCollectionManager.class, true, Collections.class), // This includes the extension in a disco#info response
 				Extension.of(OvalObjects.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 collections
-				Extension.of(AssessmentContent.class),
+				Extension.of(OvalSystemCharacteristics.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 collections
+				//Extension.of(AssessmentContent.class),
 				Extension.of(Addition.class))
 			.debugger(ConsoleDebugger.class)
+			//.defaultResponseTimeout(Duration.ofSeconds(30))
 			.build()
 
 		xmppClient = XmppClient.create(xmppDomain, collectionsConfiguration, tcpConfiguration)

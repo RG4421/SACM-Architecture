@@ -8,6 +8,7 @@ import rocks.xmpp.core.session.Manager
 import rocks.xmpp.core.session.XmppSession
 import rocks.xmpp.core.stanza.IQHandler
 import rocks.xmpp.core.stanza.model.IQ
+import rocks.xmpp.core.stanza.model.Stanza
 import rocks.xmpp.util.concurrent.AsyncResult
 
 class OvalCollectionManager extends Manager {
@@ -42,6 +43,14 @@ class OvalCollectionManager extends Manager {
 	}
 
 	AsyncResult<OvalSystemCharacteristics> collect(Jid jid, OvalObjects ovalObjects) {
-		return xmppSession.query(IQ.get(jid, ovalObjects), OvalSystemCharacteristics.class)
+		log.debug "Sending IQ.GET with OVAL Objects"
+		IQ response = IQ.get(jid, ovalObjects)
+		log.debug "Received IQ Response from OVAL Objects"
+		log.debug response.toString()
+
+		log.debug "Calling XMPPSession.query"
+		AsyncResult<OvalSystemCharacteristics> rtn =
+			xmppSession.query(response, OvalSystemCharacteristics.class)
+		return rtn
 	}
 }

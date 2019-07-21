@@ -48,7 +48,7 @@ import org.cisecurity.xmldsig.SignatureType;
     "systemData",
     "signature"
 })
-@XmlRootElement(name = "oval_system_characteristics")
+@XmlRootElement(name = "oval_system_characteristics", namespace = "http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6")
 public class OvalSystemCharacteristics {
 
     public static final String NAMESPACE = "http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6";

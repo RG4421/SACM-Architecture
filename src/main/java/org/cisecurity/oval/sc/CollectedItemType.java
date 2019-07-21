@@ -11,10 +11,8 @@ package org.cisecurity.oval.sc;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
+
 import org.cisecurity.oval.common.MessageType;
 
 
@@ -47,6 +45,7 @@ import org.cisecurity.oval.common.MessageType;
 })
 public class CollectedItemType {
 
+    @XmlElement(namespace = "http://oval.cisecurity.org/XMLSchema/oval-common-6")
     protected List<MessageType> message;
     @XmlAttribute(name = "id", required = true)
     protected BigInteger id;

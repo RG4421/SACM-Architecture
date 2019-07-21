@@ -9,11 +9,12 @@
 	namespace = "http://oval.cisecurity.org/XMLSchema/oval-collections-6",
 	elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
 	xmlns = {
-		@XmlNs(prefix="", namespaceURI = "http://oval.cisecurity.org/XMLSchema/oval-collections-6"),
-		@XmlNs(prefix="oval", namespaceURI = "http://oval.cisecurity.org/XMLSchema/oval-common-6"),
-		@XmlNs(prefix="oval-var", namespaceURI = "http://oval.cisecurity.org/XMLSchema/oval-variables-6"),
-		@XmlNs(prefix="ind-coll", namespaceURI = "http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent"),
-		@XmlNs(prefix="xmldsig", namespaceURI = "http://www.w3.org/2000/09/xmldsig#")
+//		@XmlNs(prefix="", namespaceURI = "http://oval.cisecurity.org/XMLSchema/oval-collections-6"),
+		@XmlNs(prefix="oval-coll", namespaceURI = "http://oval.cisecurity.org/XMLSchema/oval-collections-6")//,
+//		@XmlNs(prefix="oval", namespaceURI = "http://oval.cisecurity.org/XMLSchema/oval-common-6"),
+//		@XmlNs(prefix="oval-var", namespaceURI = "http://oval.cisecurity.org/XMLSchema/oval-variables-6"),
+//		@XmlNs(prefix="ind-coll", namespaceURI = "http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent"),
+//		@XmlNs(prefix="xmldsig", namespaceURI = "http://www.w3.org/2000/09/xmldsig#")
 	}
 )
 package org.cisecurity.oval.collection;
