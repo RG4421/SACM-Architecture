@@ -14,20 +14,23 @@ import rocks.xmpp.util.concurrent.AsyncResult
 class OvalCollectionManager extends Manager {
 	def log = LoggerFactory.getLogger(OvalCollectionManager.class)
 
-	private final IQHandler iqHandler
+	private final IQHandler collectionHandler
+	private final IQHandler systemCharacteristicsHandler
 
 	private OvalCollectionManager(XmppSession session) {
 		super(session)
 
 		log.debug "Constructing OVAL Collection Manager"
-		iqHandler = new OvalCollectionHandler()
+		collectionHandler = new OvalCollectionHandler()
+		systemCharacteristicsHandler = new OvalSystemCharacteristicsHandler()
 	}
 
 	@Override
 	protected void onEnable() {
 		super.onEnable()
 		log.info "Enabling OVAL Collection Manager"
-		xmppSession.addIQHandler(OvalObjects.class, iqHandler)
+		xmppSession.addIQHandler(OvalObjects.class, collectionHandler)
+		xmppSession.addIQHandler(OvalSystemCharacteristics.class, systemCharacteristicsHandler)
 	}
 
 	@Override
@@ -35,6 +38,7 @@ class OvalCollectionManager extends Manager {
 		super.onDisable()
 		log.info "Disabling OVAL Collection Manager"
 		xmppSession.removeIQHandler(OvalObjects.class)
+		xmppSession.removeIQHandler(OvalSystemCharacteristics.class)
 	}
 
 	@Override
@@ -51,6 +55,16 @@ class OvalCollectionManager extends Manager {
 		log.debug "Calling XMPPSession.query"
 		AsyncResult<OvalSystemCharacteristics> rtn =
 			xmppSession.query(response, OvalSystemCharacteristics.class)
+		return rtn
+	}
+
+	AsyncResult<OvalSystemCharacteristics> collectAndForward(Jid collector, OvalObjects ovalObjects, Jid repository) {
+		log.debug "Tell the collector to collect"
+		OvalSystemCharacteristics osc =
+			xmppSession.query(IQ.get(collector, ovalObjects), OvalSystemCharacteristics.class).getResult()
+
+		AsyncResult<OvalSystemCharacteristics> rtn =
+			xmppSession.query(IQ.get(repository, osc), OvalSystemCharacteristics.class)
 		return rtn
 	}
 }

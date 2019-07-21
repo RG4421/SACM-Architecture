@@ -221,6 +221,23 @@ class XmppProxy {
 	}
 
 	/**
+	 * This entity tells the collector to collect.
+	 * The collector returns system characteristics to this entity
+	 * This entity sends the system characteristics to the repository entity
+	 * @param collector
+	 * @param ovalObjects
+	 * @param repository
+	 * @return
+	 */
+	def ovalCollection(Jid collector, OvalObjects ovalObjects, Jid repository) {
+		OvalCollectionManager manager = xmppClient.getManager(OvalCollectionManager.class)
+		OvalSystemCharacteristics ovalSystemCharacteristics =
+			manager.collectAndForward(collector, ovalObjects, repository).getResult()
+
+		return ovalSystemCharacteristics
+	}
+
+	/**
 	 *
 	 * @return
 	 */
@@ -244,14 +261,17 @@ class XmppProxy {
 				}
 			}).build()
 
-		// Register the SACM collections
+		final String INDEPENDENT_COLLECTION_NS = "http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent"
+		final String INDEPENDENT_SYSCHAR_NS    = "http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6#independent"
+
+		// Configure the XMPP session configuration
 		XmppSessionConfiguration collectionsConfiguration = XmppSessionConfiguration.builder()
 			.extensions(
-				Extension.of("http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6#independent", false, FamilyItem.class, EnvironmentvariableItem.class),
-				Extension.of("http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent", false, FamilyObject.class, EnvironmentvariableObject.class),
-				//Extension.of(Collections.NAMESPACE, SacmCollectionManager.class, true, Collections.class), // This includes the extension in a disco#info response
+				Extension.of(INDEPENDENT_COLLECTION_NS, false, FamilyObject.class, EnvironmentvariableObject.class),
+				Extension.of(INDEPENDENT_SYSCHAR_NS, false, FamilyItem.class, EnvironmentvariableItem.class),
 				Extension.of(OvalObjects.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 collections
-				Extension.of(OvalSystemCharacteristics.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 collections
+				Extension.of(OvalSystemCharacteristics.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 system characteristics
+				//Extension.of(Collections.NAMESPACE, SacmCollectionManager.class, true, Collections.class), // This includes the extension in a disco#info response
 				//Extension.of(AssessmentContent.class),
 				Extension.of(Addition.class))
 			.debugger(ConsoleDebugger.class)

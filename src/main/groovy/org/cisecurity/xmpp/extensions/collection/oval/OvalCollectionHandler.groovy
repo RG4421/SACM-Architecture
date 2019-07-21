@@ -96,6 +96,4 @@ class OvalCollectionHandler extends AbstractIQHandler {
 		}
 		return iq.createResult(osc)
 	}
-
-
 }
