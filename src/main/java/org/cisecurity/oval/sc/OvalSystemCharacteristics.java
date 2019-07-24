@@ -8,11 +8,8 @@
 
 package org.cisecurity.oval.sc;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
+
 import org.cisecurity.oval.common.GeneratorType;
 import org.cisecurity.xmldsig.SignatureType;
 
@@ -63,6 +60,9 @@ public class OvalSystemCharacteristics {
     protected SystemDataType systemData;
     @XmlElement(name = "Signature", namespace = "http://www.w3.org/2000/09/xmldsig#")
     protected SignatureType signature;
+
+    @XmlAttribute(name = "collection-ref")
+    protected String collectionRef;
 
     /**
      * Gets the value of the generator property.
@@ -184,4 +184,6 @@ public class OvalSystemCharacteristics {
         this.signature = value;
     }
 
+    public void setCollectionRef(String collectionRef) { this.collectionRef = collectionRef; }
+    public String getCollectionRef() { return collectionRef; }
 }

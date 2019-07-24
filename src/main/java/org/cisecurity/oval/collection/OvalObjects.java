@@ -8,11 +8,8 @@
 
 package org.cisecurity.oval.collection;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
+
 import org.cisecurity.oval.common.GeneratorType;
 import org.cisecurity.oval.common.VariablesType;
 import org.cisecurity.xmldsig.SignatureType;
@@ -61,6 +58,9 @@ public class OvalObjects {
     protected VariablesType variables;
     @XmlElement(name = "Signature", namespace = "http://www.w3.org/2000/09/xmldsig#")
     protected SignatureType signature;
+
+    @XmlAttribute(name = "collection-id")
+    protected String collectionId;
 
     /**
      * Gets the value of the generator property.
@@ -182,4 +182,6 @@ public class OvalObjects {
         this.signature = value;
     }
 
+    public void setCollectionId(String collectionId) { this.collectionId = collectionId; }
+    public String getCollectionId() { return collectionId; }
 }

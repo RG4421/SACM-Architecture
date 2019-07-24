@@ -1,0 +1,17 @@
+{
+  "packages": [
+    "org.cisecurity.oval.collection.ind",
+    "org.cisecurity.oval.collection",
+    "org.cisecurity.oval.common",
+    "org.cisecurity.oval.var",
+    "org.cisecurity.xmldsig"
+  ],
+
+  "sc-packages": [
+    "org.cisecurity.oval.sc.ind",
+    "org.cisecurity.oval.sc",
+    "org.cisecurity.oval.common",
+    "org.cisecurity.oval.var",
+    "org.cisecurity.xmldsig"
+  ]
+}

@@ -1,5 +1,6 @@
 package org.cisecurity.xmpp
 
+import org.cisecurity.oval.OvalCollectionSystem
 import org.cisecurity.oval.collection.ind.EnvironmentvariableObject
 import org.cisecurity.oval.collection.ind.FamilyObject
 import org.cisecurity.oval.sc.ind.EnvironmentvariableItem
@@ -206,17 +207,29 @@ class XmppProxy {
 		def b
 	}
 
-	def ovalCollection(Jid anotherEntity) {
-		def oo = new OvalObjects()
-
+	def performCollection(Jid collector, OvalObjects ovalObjects) {
 		OvalCollectionManager m = xmppClient.getManager(OvalCollectionManager.class)
-		OvalSystemCharacteristics ovalSystemCharacteristics = m.collect(anotherEntity, oo).getResult()
+		OvalSystemCharacteristics ovalSystemCharacteristics = m.collect(collector, ovalObjects).getResult()
 		return ovalSystemCharacteristics
 	}
 
-	def ovalCollection(Jid anotherEntity, OvalObjects ovalObjects) {
+	def performCollectionAndPublish(Jid anotherEntity, OvalObjects ovalObjects) {
 		OvalCollectionManager m = xmppClient.getManager(OvalCollectionManager.class)
 		OvalSystemCharacteristics ovalSystemCharacteristics = m.collect(anotherEntity, ovalObjects).getResult()
+
+		def allNodesFromAllServices = []
+
+		PubSubManager pubSubManager = xmppClient.getManager(PubSubManager.class)
+		List<PubSubService> pubSubServices = pubSubManager.discoverPubSubServices().getResult()
+		pubSubServices.each { pss ->
+			allNodesFromAllServices.addAll(pss.discoverNodes().getResult())
+		}
+
+		PubSubNode node = allNodesFromAllServices.find { n -> n.id == "actuals" }
+		if (node) {
+			node.publish(ovalSystemCharacteristics)
+		}
+
 		return ovalSystemCharacteristics
 	}
 
@@ -229,12 +242,23 @@ class XmppProxy {
 	 * @param repository
 	 * @return
 	 */
-	def ovalCollection(Jid collector, OvalObjects ovalObjects, Jid repository) {
+	def performCollection(Jid collector, OvalObjects ovalObjects, Jid repository) {
 		OvalCollectionManager manager = xmppClient.getManager(OvalCollectionManager.class)
 		OvalSystemCharacteristics ovalSystemCharacteristics =
 			manager.collectAndForward(collector, ovalObjects, repository).getResult()
-
 		return ovalSystemCharacteristics
+	}
+
+	def sendCollectionRequest(Jid requestee, OvalObjects ovalObjects) {
+		Message message = new Message(requestee)
+		message.addExtension(ovalObjects)
+		xmppClient.send(message)
+	}
+
+	def sendCollectionResponse(Jid respondee, OvalSystemCharacteristics ovalSystemCharacteristics) {
+		Message message = new Message(respondee)
+		message.addExtension(ovalSystemCharacteristics)
+		xmppClient.send(message)
 	}
 
 	/**
@@ -273,9 +297,11 @@ class XmppProxy {
 				Extension.of(OvalSystemCharacteristics.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 system characteristics
 				//Extension.of(Collections.NAMESPACE, SacmCollectionManager.class, true, Collections.class), // This includes the extension in a disco#info response
 				//Extension.of(AssessmentContent.class),
-				Extension.of(Addition.class))
+				Extension.of(Addition.class),
+				Extension.of(OvalObjects.class),
+				Extension.of(OvalSystemCharacteristics.class))
 			.debugger(ConsoleDebugger.class)
-			//.defaultResponseTimeout(Duration.ofSeconds(30))
+			.defaultResponseTimeout(Duration.ofSeconds(30))
 			.build()
 
 		xmppClient = XmppClient.create(xmppDomain, collectionsConfiguration, tcpConfiguration)
@@ -307,14 +333,34 @@ class XmppProxy {
 ////			}
 //		}
 
-		// Listen for messages
-		xmppClient.addInboundMessageListener { e -> fmt(e) }
 
 		// Listen for messages
-		xmppClient.addOutboundMessageListener { e -> fmt(e) }
+		xmppClient.addInboundMessageListener { e ->
+			Message message = e.getMessage()
+			if (message.hasExtension(OvalObjects.class)) {
+				OvalObjects oo = message.getExtension(OvalObjects.class)
+				println " OVAL OBJECTS :: COLLECTION-ID --> ${oo.collectionId}"
+
+				def ocs = new OvalCollectionSystem(collectionRequest: oo)
+				def osc = ocs.collect()
+
+				println " [${xmppClient.connectedResource}] COLLECTED :: COLLECTION-REF --> ${osc.collectionRef}"
+			}
+		}
+
+		xmppClient.addInboundMessageListener { e ->
+			Message message = e.getMessage()
+			if (message.hasExtension(OvalSystemCharacteristics.class)) {
+				OvalSystemCharacteristics osc = message.getExtension(OvalSystemCharacteristics.class)
+				println " OVAL SYSTEM CHARACTERISTICS :: COLLECTION-REF --> ${osc.collectionRef}"
+			}
+		}
+
+		// Listen for messages
+		//xmppClient.addOutboundMessageListener { e -> fmt(e) }
 
 		// IQ HANDLERS
-		iqHandlerServices.each { iqh -> iqh.addIQHandler(xmppClient) }
+		//iqHandlerServices.each { iqh -> iqh.addIQHandler(xmppClient) }
 
 //		xmppClient.addOutboundIQListener{ e ->
 //			println "[OUTBOUND IQ] ${e.IQ}"

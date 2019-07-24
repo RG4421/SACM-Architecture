@@ -20,6 +20,7 @@ class OvalSystemCharacteristicsHandler extends AbstractIQHandler {
 	 */
 	@Override
 	protected final IQ processRequest(IQ iq) {
+		log.debug("INSIDE OvalSystemCharacteristicsHandler::processRequest")
 		return iq.createResult(iq.getExtension(OvalSystemCharacteristics.class))
 	}
 }

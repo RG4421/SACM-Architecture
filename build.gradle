@@ -10,10 +10,11 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-//    mavenLocal()
-//    maven { url "https://maven.atlassian.com/3rdparty/" }
-//    maven { url "http://repo.enonic.com/public/" }
-//    maven { url "http://repo.spring.io/plugins-release/" }
+    mavenLocal()
+    maven { url "https://maven.atlassian.com/3rdparty/" }
+    maven { url "http://repo.enonic.com/public/" }
+    maven { url "http://repo.spring.io/plugins-release/" }
+    maven { url "https://repo.spring.io/libs-milestone/" }
 }
 
 dependencies {
@@ -22,6 +23,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-jaxb
     compile group: 'org.codehaus.groovy', name: 'groovy-jaxb', version: '2.5.7'
+
+    // OVAL Collector
+    compile group: 'OVAL-Collector', name: "OVAL-Collector", version: '1.0'
 
     // https://mvnrepository.com/artifact/rocks.xmpp/xmpp-core
     compile group: 'rocks.xmpp', name: 'xmpp-core', version: '0.8.0'

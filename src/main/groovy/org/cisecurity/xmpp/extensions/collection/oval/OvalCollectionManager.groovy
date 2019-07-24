@@ -9,6 +9,9 @@ import rocks.xmpp.core.session.XmppSession
 import rocks.xmpp.core.stanza.IQHandler
 import rocks.xmpp.core.stanza.model.IQ
 import rocks.xmpp.core.stanza.model.Stanza
+import rocks.xmpp.extensions.pubsub.PubSubManager
+import rocks.xmpp.extensions.pubsub.PubSubNode
+import rocks.xmpp.extensions.pubsub.PubSubService
 import rocks.xmpp.util.concurrent.AsyncResult
 
 class OvalCollectionManager extends Manager {
@@ -47,24 +50,20 @@ class OvalCollectionManager extends Manager {
 	}
 
 	AsyncResult<OvalSystemCharacteristics> collect(Jid jid, OvalObjects ovalObjects) {
-		log.debug "Sending IQ.GET with OVAL Objects"
-		IQ response = IQ.get(jid, ovalObjects)
-		log.debug "Received IQ Response from OVAL Objects"
-		log.debug response.toString()
-
 		log.debug "Calling XMPPSession.query"
 		AsyncResult<OvalSystemCharacteristics> rtn =
-			xmppSession.query(response, OvalSystemCharacteristics.class)
+			xmppSession.query(IQ.get(jid, ovalObjects), OvalSystemCharacteristics.class)
 		return rtn
 	}
 
-	AsyncResult<OvalSystemCharacteristics> collectAndForward(Jid collector, OvalObjects ovalObjects, Jid repository) {
-		log.debug "Tell the collector to collect"
-		OvalSystemCharacteristics osc =
-			xmppSession.query(IQ.get(collector, ovalObjects), OvalSystemCharacteristics.class).getResult()
+	AsyncResult<OvalSystemCharacteristics> collectAndForward(Jid jid, OvalObjects ovalObjects, Jid recipient) {
+		log.debug "Collecting System Characteristics"
+		OvalSystemCharacteristics osc = collect(jid, ovalObjects).getResult()
 
+		log.debug "Sending System Characteristics to Recipient JID"
 		AsyncResult<OvalSystemCharacteristics> rtn =
-			xmppSession.query(IQ.get(repository, osc), OvalSystemCharacteristics.class)
+			xmppSession.query(IQ.get(recipient, osc), OvalSystemCharacteristics.class)
+
 		return rtn
 	}
 }

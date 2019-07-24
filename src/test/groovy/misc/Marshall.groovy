@@ -1,5 +1,6 @@
 package misc
 
+import groovy.json.JsonSlurper
 import org.cisecurity.oval.collection.ObjectStringType
 import org.cisecurity.oval.collection.ObjectsType
 import org.cisecurity.oval.collection.OvalObjects
@@ -30,13 +31,16 @@ eo.name = new ObjectStringType(operation: OperationEnumeration.EQUALS, value: "H
 oo.objects.object << fo
 oo.objects.object << eo
 
-def packages = [
-	"org.cisecurity.oval.collection.ind",
-	"org.cisecurity.oval.collection",
-	"org.cisecurity.oval.common",
-	"org.cisecurity.oval.var",
-	"org.cisecurity.xmldsig"
-].join(":")
+//def packages = [
+//	"org.cisecurity.oval.collection.ind",
+//	"org.cisecurity.oval.collection",
+//	"org.cisecurity.oval.common",
+//	"org.cisecurity.oval.var",
+//	"org.cisecurity.xmldsig"
+//].join(":")
+
+def json = new JsonSlurper().parse(getClass().getResourceAsStream("/packages.json"))
+def packages = json."packages".join(":")
 
 def jaxbContext= JAXBContext.newInstance(packages)
 def m = jaxbContext.createMarshaller()

@@ -2,6 +2,7 @@ package org.cisecurity.xmpp
 
 import groovy.xml.XmlUtil
 import org.cisecurity.oval.collection.OvalObjects
+import org.cisecurity.oval.sc.OvalSystemCharacteristics
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import rocks.xmpp.addr.Jid
@@ -116,18 +117,18 @@ class XmppProxyTest extends Specification {
 			def unmarshaller = jaxbContext.createUnmarshaller()
 			def sr =  new StringReader(xmltext)
 
-			OvalObjects jaxbOvalObjects = unmarshaller.unmarshal(sr)
+			OvalObjects ovalObjects = unmarshaller.unmarshal(sr)
 		when: "the orchestrator requests collector's to collect something"
 			Jid u = collector.xmppClient.connectedResource
-			def osc = orchestrator.ovalCollection(u, jaxbOvalObjects)
-		then: "a time is returned"
+			def osc = orchestrator.performCollection(u, ovalObjects)
+		then: "system characteristics are returned"
 			assert osc
 	}
 
-	def "Have the orchestrator tell an endpoint to collect and send its results to the MAP graph endpoint"() {
+	def "Have the orchestrator tell an endpoint to collect and send its results to the pub-sub topic"() {
 		given: "Some OVAL objects to be collected by the endpoint"
 			def xmltext = """
-<oval_objects  
+<oval_objects collection-id="oval:org.cisecurity:collection:9999"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://oval.cisecurity.org/XMLSchema/oval-collections-6" 
     xmlns:ind-def="http://oval.cisecurity.org/XMLSchema/oval-definitions-6#independent" 
     xmlns:oval="http://oval.cisecurity.org/XMLSchema/oval-common-6"
@@ -156,15 +157,142 @@ class XmppProxyTest extends Specification {
 			def unmarshaller = jaxbContext.createUnmarshaller()
 			def sr =  new StringReader(xmltext)
 
-			OvalObjects jaxbOvalObjects = unmarshaller.unmarshal(sr)
+			OvalObjects ovalObjects = unmarshaller.unmarshal(sr)
 		when: "The orchestrator requests that the collector gets the requested information"
 			Jid collectorJid = collector.xmppClient.connectedResource
-			//Jid recipientJid = recipient.xmppClient.connectedResource
-
-			Jid recipientJid = Jid.of("carl-heinz@ip-0a1e0af4/resource")
-
-			def osc = orchestrator.ovalCollection(collectorJid, jaxbOvalObjects, recipientJid)
+			def osc = orchestrator.performCollectionAndPublish(collectorJid, ovalObjects)
 		then: "The orchestrator then sends the collected information to the 'repository'"
 			assert osc
+	}
+
+	def "Have the orchestrator tell an endpoint to collect and send its results to the MAP graph endpoint"() {
+		given: "Some OVAL objects to be collected by the endpoint"
+			def xmltext = """
+<oval_objects collection-id="oval:org.cisecurity:collection:9999" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://oval.cisecurity.org/XMLSchema/oval-collections-6" 
+    xmlns:ind-def="http://oval.cisecurity.org/XMLSchema/oval-definitions-6#independent" 
+    xmlns:oval="http://oval.cisecurity.org/XMLSchema/oval-common-6"
+    xmlns:oval-coll="http://oval.cisecurity.org/XMLSchema/oval-collections-6"
+    xmlns:ind-coll="http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent"
+    xsi:schemaLocation="http://oval.cisecurity.org/XMLSchema/oval-collections-6 oval-collections-schema.xsd http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent independent-collections-schema.xsd">
+    <generator>
+        <oval:schema_version>6.0.0</oval:schema_version>
+        <oval:timestamp>2009-01-12T10:41:00-05:00</oval:timestamp>
+        <terms_of_use>Copyright (c) 2002-2012, The MITRE Corporation. All rights reserved. The contents of this file are subject to the license described in terms.txt.</terms_of_use>
+    </generator>
+    <objects>
+        <ind-coll:family_object 
+            id="oval:org.cisecurity:obj:1" 
+            version="1" 
+            comment="This family_object represents the family that the operating system belongs to."/>
+        
+        <ind-coll:environmentvariable_object id="oval:org.cisecurity:obj:2" version="1" comment="The HOME environment variable">
+            <ind-coll:name>COMPUTERNAME</ind-coll:name>
+        </ind-coll:environmentvariable_object>
+    </objects>
+</oval_objects>
+"""
+
+			def jaxbContext= JAXBContext.newInstance(OvalObjects.class)
+			def unmarshaller = jaxbContext.createUnmarshaller()
+			def sr =  new StringReader(xmltext)
+
+			OvalObjects ovalObjects = unmarshaller.unmarshal(sr)
+		when: "The orchestrator requests that the collector gets the requested information"
+			Jid collectorJid = collector.xmppClient.connectedResource
+			Jid recipientJid = Jid.of("carl-heinz@ip-0a1e0af4/resource")
+			//Jid recipientJid = recipient.xmppClient.connectedResource
+			def osc = orchestrator.performCollection(collectorJid, ovalObjects, recipientJid)
+		then: "The orchestrator then sends the collected information to the 'repository'"
+			assert !osc // its an empty response IQ
+	}
+
+	def "Send the <oval_objects> via standard Message stanza"() {
+		given: "A blob of XML"
+			def xmltext = """
+<oval_objects collection-id="oval:org.cisecurity:collection:12345" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://oval.cisecurity.org/XMLSchema/oval-collections-6" 
+    xmlns:ind-def="http://oval.cisecurity.org/XMLSchema/oval-definitions-6#independent" 
+    xmlns:oval="http://oval.cisecurity.org/XMLSchema/oval-common-6"
+    xmlns:oval-coll="http://oval.cisecurity.org/XMLSchema/oval-collections-6"
+    xmlns:ind-coll="http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent"
+    xsi:schemaLocation="http://oval.cisecurity.org/XMLSchema/oval-collections-6 oval-collections-schema.xsd http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent independent-collections-schema.xsd">
+    <generator>
+        <oval:schema_version>6.0.0</oval:schema_version>
+        <oval:timestamp>2009-01-12T10:41:00-05:00</oval:timestamp>
+        <terms_of_use>Copyright (c) 2002-2012, The MITRE Corporation. All rights reserved. The contents of this file are subject to the license described in terms.txt.</terms_of_use>
+    </generator>
+    <objects>
+        <ind-coll:family_object 
+            id="oval:org.cisecurity:obj:1" 
+            version="1" 
+            comment="This family_object represents the family that the operating system belongs to."/>
+        
+        <ind-coll:environmentvariable_object id="oval:org.cisecurity:obj:2" version="1" comment="The HOME environment variable">
+            <ind-coll:name>COMPUTERNAME</ind-coll:name>
+        </ind-coll:environmentvariable_object>
+    </objects>
+</oval_objects>
+"""
+
+			def jaxbContext= JAXBContext.newInstance(OvalObjects.class)
+			def unmarshaller = jaxbContext.createUnmarshaller()
+			def sr =  new StringReader(xmltext)
+
+			OvalObjects ovalObjects = unmarshaller.unmarshal(sr)
+		when: "the orchestrator sends the message to the collector"
+			orchestrator.sendCollectionRequest(collector.xmppClient.connectedResource, ovalObjects)
+		then: "you can check system.out to see if the collection-id is logged"
+			Thread.sleep(30000)
+			assert true
+	}
+
+	def "Send the <oval_system_characteristics via standard Message stanza"() {
+		given: "The OVAL system characteristics"
+			def xmltext = """
+<oval_system_characteristics xmlns="http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6" collection-ref="oval:org.cisecurity:collection:9999">
+    <generator>
+        <product_name xmlns="http://oval.cisecurity.org/XMLSchema/oval-common-6">OVAL XMPP</product_name>
+        <product_version xmlns="http://oval.cisecurity.org/XMLSchema/oval-common-6">0.0.1</product_version>
+        <schema_version xmlns="http://oval.cisecurity.org/XMLSchema/oval-common-6">6.0.0</schema_version>
+        <timestamp xmlns="http://oval.cisecurity.org/XMLSchema/oval-common-6">2019-07-21T16:39:52.451-04:00</timestamp>
+    </generator>
+    <system_info>
+        <os_name>Windows 10</os_name>
+        <os_version>10.0</os_version>
+        <architecture>amd64</architecture>
+        <primary_host_name>CIS-CAT-DEV</primary_host_name>
+        <interfaces/>
+    </system_info>
+    <collected_objects>
+        <collected_object id="oval:org.cisecurity:obj:1" version="1" comment="This family_object represents the family that the operating system belongs to." flag="complete">
+            <reference item_ref="1"/>
+        </collected_object>
+        <collected_object id="oval:org.cisecurity:obj:2" version="1" comment="The HOME environment variable" flag="complete">
+            <reference item_ref="2"/>
+        </collected_object>
+    </collected_objects>
+    <system_data>
+        <family_item xmlns="http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6#independent" id="1">
+            <family datatype="string">windows</family>
+        </family_item>
+        <environmentvariable_item xmlns="http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6#independent" id="2">
+            <name>COMPUTERNAME</name>
+            <value>CIS-CAT-DEV</value>
+        </environmentvariable_item>
+    </system_data>
+</oval_system_characteristics>"""
+
+			def jaxbContext= JAXBContext.newInstance(OvalSystemCharacteristics.class)
+			def unmarshaller = jaxbContext.createUnmarshaller()
+			def sr =  new StringReader(xmltext)
+
+			OvalSystemCharacteristics ovalSystemCharacteristics = unmarshaller.unmarshal(sr)
+		when: "The collector sends the message to the orchestrator"
+			Jid carlheinzJid = Jid.of("carl-heinz@ip-0a1e0af4/resource")
+			collector.sendCollectionResponse(carlheinzJid, ovalSystemCharacteristics)
+//			collector.sendCollectionResponse(orchestrator.xmppClient.connectedResource, ovalSystemCharacteristics)
+		then: "you can check system.out to see if the collection-ref is logged"
+			assert true
 	}
 }
