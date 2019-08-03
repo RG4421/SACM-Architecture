@@ -1,11 +1,10 @@
-package org.cisecurity.oval
+package org.cisecurity.xmpp.extensions.collection.oval
 
 import groovy.json.JsonSlurper
 import groovy.xml.XmlUtil
 import org.cisecurity.oval.collection.OvalObjects
 import org.cisecurity.oval.sc.OvalSystemCharacteristics
 import org.cisecurity.session.fact.SessionConfig
-import org.cisecurity.session.fact.SessionFactoryFactory
 import org.slf4j.LoggerFactory
 
 import javax.xml.bind.JAXBContext
@@ -36,44 +35,12 @@ class OvalCollectionSystem {
 		org.cisecurity.collector.oval.coll.OvalObjects collectionDataModel =
 			new org.cisecurity.collector.oval.coll.OvalObjects()
 
-		collectionDataModel.session =
-			new SessionFactoryFactory().getSessionFactory().getSession(sessionConfig)
-
-		if (collectionDataModel.session.isWindows()) {
-			log.info "Connection type is Windows:"
-			log.info "--> Unzipping [START]"
-			def unzipCmd = "${collectionDataModel.session.connectionTmpPathname}unzip.exe"
-			def zipfile  = "${collectionDataModel.session.connectionTmpPathname}scripts.zip"
-			def fullCmd  = "${unzipCmd} -o -qq ${zipfile} -d ${collectionDataModel.session.connectionTmpPathname}"
-
-			try {
-				def rc = collectionDataModel.session.execute(fullCmd)
-
-				log.info "--> Unzipping [ END ]   (rc = ${rc.exitValue})"
-			} catch (Exception e) {
-				log.error "Exception Unzipping ${zipfile}", e
-
-				log.info "An exception was caught while attempting to unzip files within the Assessor's ephemeral directory."
-				log.info "Ensure all WinRM and SMB permissions have been configured correctly."
-				log.info "- Ensure the connecting user: ${sessionConfig.user} is granted administrator privileges;"
-				log.info "- If connecting to a non-domain-joined endpoint, ensure UAC remote restrictions have been disabled;"
-				log.info "- If connecting via WinRM over HTTP, ensure the WinRM service is configured with \"allowUnencrypted=true\";"
-				log.info "- Ensure any WinRM IPv4/6 filters are configured to allow remote access from the Assessor host."
-				log.info ""
-				log.info "Consult the CIS-CAT Pro Assessor Configuration Guide for more information."
-				log.info "The session will now be disconnected."
-				log.info ""
-
-				collectionDataModel.session.disconnect()
-
-				return null
-			}
-		}
-		log.info "Connection established."
-
+		collectionDataModel.connectSession(sessionConfig)
 		collectionDataModel.parse(ovalObjectsNode)
 
 		def systemCharacteristicsNode = collectionDataModel.collectSystemCharacteristics()
+		collectionDataModel.disconnectSession()
+
 		return unmarshallToObject(systemCharacteristicsNode)
 	}
 
@@ -108,6 +75,11 @@ class OvalCollectionSystem {
 		return node
 	}
 
+	/**
+	 * Unmarshall a groovy Node to its JAXB representation
+	 * @param node
+	 * @return
+	 */
 	def unmarshallToObject(def node) {
 		def json = new JsonSlurper().parse(getClass().getResourceAsStream("/packages.json"))
 		def packages = json."sc-packages".join(":")

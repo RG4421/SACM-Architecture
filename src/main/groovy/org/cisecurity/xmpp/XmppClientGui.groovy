@@ -1,6 +1,5 @@
 package org.cisecurity.xmpp
 
-import groovy.beans.Bindable
 import groovy.swing.SwingBuilder
 
 import javax.swing.*
@@ -10,14 +9,14 @@ import java.awt.event.WindowAdapter
 /**
  * Basic GUI that connects to XMPP
  */
-class XmppClientApplication {
+class XmppClientGui {
 
 	final String DOMAIN = "ip-0a1e0af4"
 
 	XmppProxy xmppProxy
 
 	static void main(String[] args) {
-		new XmppClientApplication().start()
+		new XmppClientGui().start()
 	}
 
 	def swing = new SwingBuilder()

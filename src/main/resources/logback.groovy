@@ -28,5 +28,5 @@ appender("ROLLING", RollingFileAppender) {
     }
 }
 
-//root(DEBUG, ["STDOUT"])
-root(DEBUG, ["ROLLING"])
+root(DEBUG, ["STDOUT"])
+//root(DEBUG, ["ROLLING"])

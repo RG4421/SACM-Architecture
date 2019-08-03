@@ -1,6 +1,6 @@
 package org.cisecurity.xmpp
 
-import org.cisecurity.oval.OvalCollectionSystem
+import org.cisecurity.xmpp.extensions.collection.oval.OvalCollectionSystem
 import org.cisecurity.oval.collection.ind.EnvironmentvariableObject
 import org.cisecurity.oval.collection.ind.FamilyObject
 import org.cisecurity.oval.sc.ind.EnvironmentvariableItem
@@ -15,7 +15,6 @@ import org.cisecurity.oval.collection.OvalObjects
 import org.cisecurity.oval.sc.OvalSystemCharacteristics
 import org.cisecurity.xmpp.addition.model.Addition
 import org.cisecurity.xmpp.extensions.collection.oval.OvalCollectionManager
-import org.cisecurity.xmpp.extensions.collection.sacm.SacmCollectionManager
 import org.cisecurity.xmpp.extensions.collection.sacm.model.Collection
 import org.cisecurity.xmpp.extensions.collection.sacm.model.CollectionFields
 import org.cisecurity.xmpp.extensions.collection.sacm.model.CollectionType
@@ -295,8 +294,6 @@ class XmppProxy {
 				Extension.of(INDEPENDENT_SYSCHAR_NS, false, FamilyItem.class, EnvironmentvariableItem.class),
 				Extension.of(OvalObjects.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 collections
 				Extension.of(OvalSystemCharacteristics.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 system characteristics
-				//Extension.of(Collections.NAMESPACE, SacmCollectionManager.class, true, Collections.class), // This includes the extension in a disco#info response
-				//Extension.of(AssessmentContent.class),
 				Extension.of(Addition.class),
 				Extension.of(OvalObjects.class),
 				Extension.of(OvalSystemCharacteristics.class))
