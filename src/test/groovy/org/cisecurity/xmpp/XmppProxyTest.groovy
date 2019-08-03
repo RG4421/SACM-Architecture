@@ -3,6 +3,7 @@ package org.cisecurity.xmpp
 import groovy.xml.XmlUtil
 import org.cisecurity.oval.collection.OvalObjects
 import org.cisecurity.oval.sc.OvalSystemCharacteristics
+import org.cisecurity.oval.sc.ind.FamilyItem
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import rocks.xmpp.addr.Jid
@@ -48,14 +49,14 @@ class XmppProxyTest extends Specification {
 		recipient.close()
 	}
 
-	def "SendMessage"() {
+	def "Ensure the collector XMPP entity supports OVAL v6 collection capabilities"() {
 		given: "A bogus chat message"
 			Chat chat = new Chat(to: "collector", msg: "doesnt matter")
 		when: "The IQ is sent from 'orchestrator' to 'collector'"
 			Jid u = collector.xmppClient.connectedResource
 			orchestrator.discoverServices(u)
 		then: "the callback function is called, setting the var"
-			false
+			assert orchestrator.xmppClient.isSupported("http://oval.cisecurity.org/XMLSchema/oval-collections-6", u).result
 	}
 
 	def "File Transfer"() {
@@ -85,7 +86,7 @@ class XmppProxyTest extends Specification {
 		true
 	}
 
-	def "OVAL Collections"() {
+	def "Have the orchestrator tell an endpoint to collect and simply ensure some system characteristics are collected"() {
 		given: "A blob of XML"
 			def xmltext = """
 <oval_objects  
@@ -122,7 +123,9 @@ class XmppProxyTest extends Specification {
 			Jid u = collector.xmppClient.connectedResource
 			def osc = orchestrator.performCollection(u, ovalObjects)
 		then: "system characteristics are returned"
-			assert osc
+			assert osc.systemData.collectedItem.size() == 2
+			assert osc.systemData.collectedItem[0] instanceof FamilyItem
+			assert ((FamilyItem)osc.systemData.collectedItem[0]).family.value == "windows"
 	}
 
 	def "Have the orchestrator tell an endpoint to collect and send its results to the pub-sub topic"() {

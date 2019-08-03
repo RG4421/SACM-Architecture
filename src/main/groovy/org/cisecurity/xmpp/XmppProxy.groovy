@@ -7,23 +7,11 @@ import org.cisecurity.oval.sc.ind.EnvironmentvariableItem
 import org.cisecurity.oval.sc.ind.FamilyItem
 import org.cisecurity.xmpp.exc.XmppConnectionInvalidCredentialsException
 import org.cisecurity.xmpp.exc.XmppConnectionInvalidException
-import org.cisecurity.xmpp.extensions.collection.sacm.model.DatatypeEnumeration
-import org.cisecurity.xmpp.svc.AdditionServiceDemo
-import org.cisecurity.xmpp.svc.AssessmentContentService
-import org.cisecurity.xmpp.svc.CollectionsService
 import org.cisecurity.oval.collection.OvalObjects
 import org.cisecurity.oval.sc.OvalSystemCharacteristics
 import org.cisecurity.xmpp.addition.model.Addition
 import org.cisecurity.xmpp.extensions.collection.oval.OvalCollectionManager
-import org.cisecurity.xmpp.extensions.collection.sacm.model.Collection
-import org.cisecurity.xmpp.extensions.collection.sacm.model.CollectionFields
-import org.cisecurity.xmpp.extensions.collection.sacm.model.CollectionType
-import org.cisecurity.xmpp.extensions.collection.sacm.model.Collections
-import org.cisecurity.xmpp.extensions.collection.sacm.model.FamilyEnumeration
-import org.cisecurity.xmpp.extensions.collection.sacm.model.FieldType
-import org.cisecurity.xmpp.extensions.collection.sacm.model.OperationEnumeration
 import org.cisecurity.xmpp.trust.TrustAllX509TrustManager
-import org.ietf.sacm.list.model.AssessmentContent
 import rocks.xmpp.addr.Jid
 import rocks.xmpp.core.net.client.SocketConnectionConfiguration
 import rocks.xmpp.core.session.Extension
@@ -59,12 +47,6 @@ class XmppProxy {
 	String       xmppDomain
 	//SwingBuilder swingBuilder
 	Closure callback
-
-	def iqHandlerServices = [
-		new AssessmentContentService(),
-		new AdditionServiceDemo(),
-		new CollectionsService()
-	]
 
 	/**
 	 *
@@ -108,23 +90,6 @@ class XmppProxy {
 //					Message.Type.CHAT,
 //					chat.msg)
 //			)
-			Collections sample = createSample()
-			IQ resultIQ0 = xmppClient.query(IQ.get(Jid.of("${chat.to}@${xmppDomain}/resource"), sample)).getResult()
-			callback(resultIQ0.getExtension(Collections.class))
-
-			Jid to   = Jid.of("${chat.to}@${xmppDomain}/resource")
-			Jid from = Jid.of("orchestrator@ip-0a1e0af4/resource")
-			AssessmentContent assessmentContent = new AssessmentContent("list")
-			IQ requestIQ = new IQ(
-				to, // to JID
-				IQ.Type.GET,                        // type
-				assessmentContent,                  // extension
-				null,                               // id (null == generate one)
-				from,                               // from JID
-				null,                               // Locale
-				null)                               // StanzaError
-			IQ resultIQ = xmppClient.query(requestIQ).getResult()
-			callback(resultIQ.getExtension(AssessmentContent.class))
 
 			try {
 				Addition addition = new Addition(52, 22)
@@ -172,7 +137,7 @@ class XmppProxy {
 //		ItemNode node = serviceDiscoveryManager.discoverItems(anotherEntity).result
 //		println node.node
 //		node.items.each { i -> println i.name}
-		println "SACM? ${xmppClient.isSupported("http://cisecurity.org/sacm/sacm-collection", anotherEntity).result}"
+		println "SACM? ${xmppClient.isSupported("http://oval.cisecurity.org/XMLSchema/oval-collections-6", anotherEntity).result}"
 
 		xmppClient.getEnabledFeatures().each { f -> println f}
 	}
@@ -293,10 +258,10 @@ class XmppProxy {
 				Extension.of(INDEPENDENT_COLLECTION_NS, false, FamilyObject.class, EnvironmentvariableObject.class),
 				Extension.of(INDEPENDENT_SYSCHAR_NS, false, FamilyItem.class, EnvironmentvariableItem.class),
 				Extension.of(OvalObjects.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 collections
-				Extension.of(OvalSystemCharacteristics.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 system characteristics
-				Extension.of(Addition.class),
 				Extension.of(OvalObjects.class),
-				Extension.of(OvalSystemCharacteristics.class))
+				Extension.of(OvalSystemCharacteristics.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 system characteristics
+				Extension.of(OvalSystemCharacteristics.class),
+				Extension.of(Addition.class))  // This is a sample extension from the xmpp.rocks documentation
 			.debugger(ConsoleDebugger.class)
 			.defaultResponseTimeout(Duration.ofSeconds(30))
 			.build()
@@ -391,8 +356,6 @@ class XmppProxy {
 		}
 
 		xmppClient.connect()
-
-//		Item
 	}
 
 	/**
@@ -407,42 +370,5 @@ class XmppProxy {
 
 		//swingBuilder."conversation".text += fm + System.lineSeparator()
 		callback(fm)
-	}
-
-	AssessmentContent createAssessmentContentRequest() {
-		return new AssessmentContent()
-	}
-
-	Collections createSample() {
-		Collections sacmCollections = new Collections()
-
-		def collectionType = new CollectionType()
-		collectionType.setFamily(FamilyEnumeration.WINDOWS)
-		collectionType.setType("file")
-
-		def collectionFields = new CollectionFields()
-		def pathField = new FieldType()
-		pathField.setName("path")
-		pathField.setDatatype(DatatypeEnumeration.STRING)
-		pathField.setOperation(OperationEnumeration.CASE_INSENSITIVE_EQUALS)
-		pathField.setValue("C:\\Temp")
-
-		def filenameField = new FieldType()
-		filenameField.setName("filename")
-		filenameField.setDatatype(DatatypeEnumeration.STRING)
-		filenameField.setOperation(OperationEnumeration.CASE_INSENSITIVE_EQUALS)
-		filenameField.setValue("out.html")
-
-		collectionFields.collectionField.add(pathField)
-		collectionFields.collectionField.add(filenameField)
-
-		def sacmCollection = new Collection()
-		sacmCollection.setCollectionId(100)
-		sacmCollection.setCollectionType(collectionType)
-		sacmCollection.setCollectionFields(collectionFields)
-
-		sacmCollections.collection.add(sacmCollection)
-
-		return sacmCollections
 	}
 }
