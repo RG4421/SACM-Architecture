@@ -13,5 +13,47 @@
     "org.cisecurity.oval.common",
     "org.cisecurity.oval.var",
     "org.cisecurity.xmldsig"
+  ],
+
+  "collections": [
+    {
+      "namespace": "http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent",
+      "classes": [
+        "org.cisecurity.oval.collection.ind.EnvironmentvariableObject",
+        "org.cisecurity.oval.collection.ind.EnvironmentvariableFilter",
+        "org.cisecurity.oval.collection.ind.FamilyObject",
+        "org.cisecurity.oval.collection.ind.FilehashObject",
+        "org.cisecurity.oval.collection.ind.FilehashFilter",
+        "org.cisecurity.oval.collection.ind.LdapObject",
+        "org.cisecurity.oval.collection.ind.LdapFilter",
+        "org.cisecurity.oval.collection.ind.ProcessenvironmentObject",
+        "org.cisecurity.oval.collection.ind.ProcessenvironmentFilter",
+        "org.cisecurity.oval.collection.ind.SqlObject",
+        "org.cisecurity.oval.collection.ind.SqlFilter",
+        "org.cisecurity.oval.collection.ind.TextfilecontentObject",
+        "org.cisecurity.oval.collection.ind.TextfilecontentFilter",
+        "org.cisecurity.oval.collection.ind.VariableObject",
+        "org.cisecurity.oval.collection.ind.VariableFilter",
+        "org.cisecurity.oval.collection.ind.XmlfilecontentObject",
+        "org.cisecurity.oval.collection.ind.XmlfilecontentFilter"
+      ]
+    }
+  ],
+
+  "system-characteristics": [
+    {
+      "namespace": "http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6#independent",
+      "classes": [
+        "org.cisecurity.oval.sc.ind.EnvironmentvariableItem",
+        "org.cisecurity.oval.sc.ind.FamilyItem",
+        "org.cisecurity.oval.sc.ind.FilehashItem",
+        "org.cisecurity.oval.sc.ind.LdapItem",
+        "org.cisecurity.oval.sc.ind.ProcessenvironmentItem",
+        "org.cisecurity.oval.sc.ind.SqlItem",
+        "org.cisecurity.oval.sc.ind.TextfilecontentItem",
+        "org.cisecurity.oval.sc.ind.VariableItem",
+        "org.cisecurity.oval.sc.ind.XmlfilecontentItem"
+      ]
+    }
   ]
 }

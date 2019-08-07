@@ -52,7 +52,7 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
 
     // https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE
-    compile group: 'net.sf.saxon', name: 'Saxon-HE', version: '9.9.0-2'
+    //compile group: 'net.sf.saxon', name: 'Saxon-HE', version: '9.9.0-2'
 
     // https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server
     compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.19.v20190610'

@@ -35,7 +35,7 @@ import org.cisecurity.oval.sc.CollectedItemType;
 public class ObjectFactory {
 
     private final static QName _FamilyItem_QNAME = new QName("http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6#independent", "family_item");
-    private final static QName _CollectedItem_QNAME = new QName("http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6", "collected_item");
+//    private final static QName _CollectedItem_QNAME = new QName("http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6", "collected_item");
     private final static QName _TextfilecontentItem_QNAME = new QName("http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6#independent", "textfilecontent_item");
     private final static QName _VariableItem_QNAME = new QName("http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6#independent", "variable_item");
     private final static QName _ProcessenvironmentItem_QNAME = new QName("http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6#independent", "processenvironment_item");
@@ -184,14 +184,14 @@ public class ObjectFactory {
         return new JAXBElement<FamilyItem>(_FamilyItem_QNAME, FamilyItem.class, null, value);
     }
 
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link CollectedItemType }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6", name = "collected_item")
-    public JAXBElement<CollectedItemType> createCollectedItem(CollectedItemType value) {
-        return new JAXBElement<CollectedItemType>(_CollectedItem_QNAME, CollectedItemType.class, null, value);
-    }
+//    /**
+//     * Create an instance of {@link JAXBElement }{@code <}{@link CollectedItemType }{@code >}}
+//     *
+//     */
+//    @XmlElementDecl(namespace = "http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6", name = "collected_item")
+//    public JAXBElement<CollectedItemType> createCollectedItem(CollectedItemType value) {
+//        return new JAXBElement<CollectedItemType>(_CollectedItem_QNAME, CollectedItemType.class, null, value);
+//    }
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link TextfilecontentItem }{@code >}}

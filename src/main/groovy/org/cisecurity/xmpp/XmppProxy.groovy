@@ -1,5 +1,7 @@
 package org.cisecurity.xmpp
 
+import groovy.json.JsonSlurper
+import org.cisecurity.oval.collection.ind.EnvironmentvariableFilter
 import org.cisecurity.xmpp.extensions.collection.oval.OvalCollectionSystem
 import org.cisecurity.oval.collection.ind.EnvironmentvariableObject
 import org.cisecurity.oval.collection.ind.FamilyObject
@@ -249,14 +251,12 @@ class XmppProxy {
 				}
 			}).build()
 
-		final String INDEPENDENT_COLLECTION_NS = "http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent"
-		final String INDEPENDENT_SYSCHAR_NS    = "http://oval.cisecurity.org/XMLSchema/oval-system-characteristics-6#independent"
-
 		// Configure the XMPP session configuration
-		XmppSessionConfiguration collectionsConfiguration = XmppSessionConfiguration.builder()
+		XmppSessionConfiguration.Builder sessionConfigurationBuilder = XmppSessionConfiguration.builder()
+		//XmppSessionConfiguration collectionsConfiguration = XmppSessionConfiguration.builder()
 			.extensions(
-				Extension.of(INDEPENDENT_COLLECTION_NS, false, FamilyObject.class, EnvironmentvariableObject.class),
-				Extension.of(INDEPENDENT_SYSCHAR_NS, false, FamilyItem.class, EnvironmentvariableItem.class),
+				//Extension.of(INDEPENDENT_COLLECTION_NS, false, cs),
+				//Extension.of(INDEPENDENT_SYSCHAR_NS, false, ss),
 				Extension.of(OvalObjects.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 collections
 				Extension.of(OvalObjects.class),
 				Extension.of(OvalSystemCharacteristics.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 system characteristics
@@ -264,8 +264,31 @@ class XmppProxy {
 				Extension.of(Addition.class))  // This is a sample extension from the xmpp.rocks documentation
 			.debugger(ConsoleDebugger.class)
 			.defaultResponseTimeout(Duration.ofSeconds(30))
-			.build()
 
+		// Load up the package/class definitions for extensions...
+		def json = new JsonSlurper().parse(getClass().getResourceAsStream("/packages.json"))
+
+		// COLLECTION
+		json."collections".each { collection ->
+			Class[] collectionClasses = new Class[collection."classes".size()]
+			collection."classes".eachWithIndex { clazz, i -> collectionClasses[i] = Class.forName(clazz) }
+
+			// Add the extension to the builder
+			sessionConfigurationBuilder.extensions(Extension.of(collection."namespace", false, collectionClasses))
+		}
+
+		// SYSTEM CHARACTERISTICS
+		json."system-characteristics".each { scs ->
+			Class[] systemCharacteristicsClasses = new Class[scs."classes".size()]
+			scs."classes".eachWithIndex { clazz, i -> systemCharacteristicsClasses[i] = Class.forName(clazz) }
+
+			// Add the extension to the builder
+			sessionConfigurationBuilder.extensions(Extension.of(scs."namespace", false, systemCharacteristicsClasses))
+		}
+
+		// TODO: EVALUATION?
+
+		XmppSessionConfiguration collectionsConfiguration = sessionConfigurationBuilder.build()
 		xmppClient = XmppClient.create(xmppDomain, collectionsConfiguration, tcpConfiguration)
 
 //		xmppClient.addOutboundPresenceListener { e ->
