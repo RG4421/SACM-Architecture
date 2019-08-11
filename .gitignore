@@ -18,3 +18,5 @@ src/main/java/unzip_into_src_java4\.zip
 src/main/resources/conn\.properties
 
 src/test/resources/test-conn\.properties
+
+build/
