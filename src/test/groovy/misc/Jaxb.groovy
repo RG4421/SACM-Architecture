@@ -1,10 +1,6 @@
 package misc
 
 import groovy.json.JsonSlurper
-import groovy.xml.XmlUtil
-import org.apache.groovy.jaxb.extensions.JaxbExtensions
-import org.cisecurity.oval.collection.OvalObjects
-
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.helpers.DefaultValidationEventHandler
 
@@ -55,25 +51,12 @@ def xmltext = """
 </oval_objects>
 """
 
-def packages = [
-	"org.cisecurity.oval.collection.ind",
-	"org.cisecurity.oval.collection",
-    "org.cisecurity.oval.common",
-    "org.cisecurity.oval.var",
-	"org.cisecurity.xmldsig"
-].join(":")
-//def json = new JsonSlurper().parse(getClass().getResourceAsStream("/packages.json"))
-//def packages = json."packages".join(":")
+def json = new JsonSlurper().parse(getClass().getResourceAsStream("/packages.json"))
+def packages = json."packages".join(":")
 
 def jaxbContext= JAXBContext.newInstance(packages)
-//println jaxbContext.toString()
 def unmarshaller = jaxbContext.createUnmarshaller()
 unmarshaller.setEventHandler(new DefaultValidationEventHandler())
 
-//def xml = new XmlParser(false, true).parseText(xmltext)
-//def xml2unmarshall = XmlUtil.serialize(xml)
-def sr =  new StringReader(xmltext)
-
-//OvalObjects oo = JaxbExtensions.unmarshal(jaxbContext, xmltext, OvalObjects.class)
-def jaxbOvalObjects = unmarshaller.unmarshal(sr)
+def jaxbOvalObjects = unmarshaller.unmarshal(new StringReader(xmltext))
 def b

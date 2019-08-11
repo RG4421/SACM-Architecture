@@ -1,0 +1,15 @@
+body {
+    font-family: Helvetica;
+}
+
+h2 {
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+#log {
+    padding: 10px;
+}

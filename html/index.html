@@ -3,8 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>Jetty</title>
+    <link rel="stylesheet" href="scripts/jquery-ui.css"/>
+    <link rel="stylesheet" href="scripts/jquery-ui.structure.css"/>
+    <link rel="stylesheet" href="scripts/jquery-ui.theme.css"/>
+    <script src="scripts/jquery-3.4.1.js"></script>
+    <script src="scripts/jquery-ui.js"></script>
+    <script src="scripts/strophe.js"></script>
+
+    <link rel="stylesheet" href="xmpp.css"/>
+    <script src="scripts/xmpp.js"></script>
 </head>
 <body>
- <h2>Static Resource Success</h2>
+ <h2>XMPP</h2>
+
+    <div id="log"></div>
+
+    <div id="login_dialog" class="hidden">
+        <label>JID:</label><input type="text" id="jid"/>
+        <label>Password:</label><input type="password" id="pwd"/>
+    </div>
 </body>
 </html>
