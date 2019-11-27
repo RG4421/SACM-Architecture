@@ -65,10 +65,8 @@ public class LdapObject
     protected Set set;
     protected LdapBehaviors behaviors;
     protected ObjectStringType suffix;
-    @XmlElementRef(name = "relative_dn", namespace = "http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent", type = JAXBElement.class, required = false)
-    protected JAXBElement<ObjectStringType> relativeDn;
-    @XmlElementRef(name = "attribute", namespace = "http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent", type = JAXBElement.class, required = false)
-    protected JAXBElement<ObjectStringType> attribute;
+    protected ObjectStringType relativeDn;
+    protected ObjectStringType attribute;
     @XmlElement(name = "object_filter", namespace = "http://oval.cisecurity.org/XMLSchema/oval-collections-6")
     protected List<ObjectFilter> objectFilter;
 
@@ -152,7 +150,7 @@ public class LdapObject
      *     {@link JAXBElement }{@code <}{@link ObjectStringType }{@code >}
      *     
      */
-    public JAXBElement<ObjectStringType> getRelativeDn() {
+    public ObjectStringType getRelativeDn() {
         return relativeDn;
     }
 
@@ -164,7 +162,7 @@ public class LdapObject
      *     {@link JAXBElement }{@code <}{@link ObjectStringType }{@code >}
      *     
      */
-    public void setRelativeDn(JAXBElement<ObjectStringType> value) {
+    public void setRelativeDn(ObjectStringType value) {
         this.relativeDn = value;
     }
 
@@ -176,7 +174,7 @@ public class LdapObject
      *     {@link JAXBElement }{@code <}{@link ObjectStringType }{@code >}
      *     
      */
-    public JAXBElement<ObjectStringType> getAttribute() {
+    public ObjectStringType getAttribute() {
         return attribute;
     }
 
@@ -188,7 +186,7 @@ public class LdapObject
      *     {@link JAXBElement }{@code <}{@link ObjectStringType }{@code >}
      *     
      */
-    public void setAttribute(JAXBElement<ObjectStringType> value) {
+    public void setAttribute(ObjectStringType value) {
         this.attribute = value;
     }
 

@@ -1,6 +1,10 @@
 package org.cisecurity.xmpp
 
 import groovy.json.JsonSlurper
+import org.cisecurity.csat.Control
+import org.cisecurity.csat.Csat
+import org.cisecurity.csat.Invalid
+import org.cisecurity.csat.Valid
 import org.cisecurity.oval.collection.ind.EnvironmentvariableFilter
 import org.cisecurity.xmpp.extensions.collection.oval.OvalCollectionSystem
 import org.cisecurity.oval.collection.ind.EnvironmentvariableObject
@@ -21,6 +25,8 @@ import rocks.xmpp.core.session.XmppClient
 import rocks.xmpp.core.session.XmppSession
 import rocks.xmpp.core.session.XmppSessionConfiguration
 import rocks.xmpp.core.session.debug.ConsoleDebugger
+import rocks.xmpp.core.stanza.AbstractIQHandler
+import rocks.xmpp.core.stanza.IQHandler
 import rocks.xmpp.core.stanza.model.IQ
 import rocks.xmpp.core.stanza.model.Message
 import rocks.xmpp.core.stanza.model.StanzaErrorException
@@ -216,7 +222,7 @@ class XmppProxy {
 	}
 
 	def sendCollectionRequest(Jid requestee, OvalObjects ovalObjects) {
-		Message message = new Message(requestee)
+		Message message = new Message(requestee, Message.Type.NORMAL, "[BODY] Payload is a collection request", "[SUBJECT] OVAL collection request")
 		message.addExtension(ovalObjects)
 		xmppClient.send(message)
 	}
@@ -225,6 +231,18 @@ class XmppProxy {
 		Message message = new Message(respondee)
 		message.addExtension(ovalSystemCharacteristics)
 		xmppClient.send(message)
+	}
+
+	def sendCSATAverageRequest(Jid recipient, Csat csat) {
+		Message message = new Message(recipient, Message.Type.NORMAL, "[BODY] CSAT Average Request", "[SUBJECT] CSAT Average Request")
+		message.addExtension(csat)
+		xmppClient.sendMessage(message)
+	}
+
+	def sendCSATValidationRequest(Jid recipient, Csat csat) {
+		Message message = new Message(recipient, Message.Type.NORMAL, "[BODY] CSAT Validation Request", "[SUBJECT] CSAT Validation Request")
+		message.addExtension(csat)
+		xmppClient.sendMessage(message)
 	}
 
 	/**
@@ -261,6 +279,7 @@ class XmppProxy {
 				Extension.of(OvalObjects.class),
 				Extension.of(OvalSystemCharacteristics.NAMESPACE, OvalCollectionManager.class, true, OvalObjects.class, OvalSystemCharacteristics.class), // Include OVAL-6 system characteristics
 				Extension.of(OvalSystemCharacteristics.class),
+				Extension.of(Csat.class),
 				Extension.of(Addition.class))  // This is a sample extension from the xmpp.rocks documentation
 			.debugger(ConsoleDebugger.class)
 			.defaultResponseTimeout(Duration.ofSeconds(30))
@@ -341,17 +360,49 @@ class XmppProxy {
 			}
 		}
 
+		xmppClient.addInboundMessageListener { e ->
+			Message message = e.getMessage()
+			if (message.hasExtension(Csat.class)) {
+				Csat csat = message.getExtension(Csat.class)
+				if (csat.validation) {
+					println "RECEIVED CSAT VALIDATION MESSAGE: @validation-key='${csat.validation.licenseKey}'"
+				} else if (csat.average) {
+					println "RECEIVED CSAT AVERAGE MESSAGE: @industry='${csat.average.industry}' @validation-key='${csat.average.licenseKey}'"
+				}
+			}
+		}
+
 		// Listen for messages
 		//xmppClient.addOutboundMessageListener { e -> fmt(e) }
 
 		// IQ HANDLERS
 		//iqHandlerServices.each { iqh -> iqh.addIQHandler(xmppClient) }
+		xmppClient.addIQHandler(Csat.class, new IQHandler() {
+			@Override
+			IQ handleRequest(IQ iq) {
+				Csat csat = iq.getExtension(Csat.class)
+				if (csat.validation) {
+					println "RECEIVED CSAT VALIDATION MESSAGE: @validation-key='${csat.validation.licenseKey}'"
+
+					if (csat.validation.licenseKey == "d31f4355-ad3a-4214-ac69-b3625ffe4612") {
+						csat.validation.valid = new Valid()
+					} else {
+						csat.validation.invalid = new Invalid(reason: ["Invalid license key"])
+					}
+				} else if (csat.average) {
+					println "RECEIVED CSAT AVERAGE MESSAGE: @industry='${csat.average.industry}' @validation-key='${csat.average.licenseKey}'"
+					csat.average.control << new Control(id: 1, average: 2.3)
+					csat.average.control << new Control(id: 2, average: 2.3)
+				}
+				return iq.createResult(csat)
+			}
+		})
 
 //		xmppClient.addOutboundIQListener{ e ->
 //			println "[OUTBOUND IQ] ${e.IQ}"
 //		}
 //		xmppClient.addInboundIQListener { e ->
-//			println "[INBOUND IQ] ${e.IQ}"
+//			println "[OUTBOUND IQ] ${e.IQ}"
 //		}
 
 		// Listen for roster pushes

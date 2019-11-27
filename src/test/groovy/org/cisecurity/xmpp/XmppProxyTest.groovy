@@ -222,7 +222,8 @@ class XmppProxyTest extends Specification {
     xmlns:oval="http://oval.cisecurity.org/XMLSchema/oval-common-6"
     xmlns:oval-coll="http://oval.cisecurity.org/XMLSchema/oval-collections-6"
     xmlns:ind-coll="http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent"
-    xsi:schemaLocation="http://oval.cisecurity.org/XMLSchema/oval-collections-6 oval-collections-schema.xsd http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent independent-collections-schema.xsd">
+    xmlns:win-coll="http://oval.cisecurity.org/XMLSchema/oval-collections-6#windows"
+    xsi:schemaLocation="http://oval.cisecurity.org/XMLSchema/oval-collections-6 oval-collections-schema.xsd http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent independent-collections-schema.xsd http://oval.cisecurity.org/XMLSchema/oval-collections-6#windows windows-collections-schema.xsd">
     <generator>
         <oval:schema_version>6.0.0</oval:schema_version>
         <oval:timestamp>2009-01-12T10:41:00-05:00</oval:timestamp>
@@ -237,6 +238,11 @@ class XmppProxyTest extends Specification {
         <ind-coll:environmentvariable_object id="oval:org.cisecurity:obj:2" version="1" comment="The HOME environment variable">
             <ind-coll:name>COMPUTERNAME</ind-coll:name>
         </ind-coll:environmentvariable_object>
+        
+        <win-coll:passwordpolicy_object 
+            id="oval:org.cisecurity:obj:3" 
+            version="1" 
+            comment="This passwordpolicy_object represents the single password policy for the target endpoint."/>
     </objects>
 </oval_objects>
 """

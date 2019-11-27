@@ -60,8 +60,7 @@ public class ProcessenvironmentObject
 
     @XmlElement(namespace = "http://oval.cisecurity.org/XMLSchema/oval-collections-6")
     protected Set set;
-    @XmlElementRef(name = "pid", namespace = "http://oval.cisecurity.org/XMLSchema/oval-collections-6#independent", type = JAXBElement.class, required = false)
-    protected JAXBElement<ObjectIntType> pid;
+    protected ObjectIntType pid;
     protected ObjectStringType name;
     @XmlElement(name = "object_filter", namespace = "http://oval.cisecurity.org/XMLSchema/oval-collections-6")
     protected List<ObjectFilter> objectFilter;
@@ -98,7 +97,7 @@ public class ProcessenvironmentObject
      *     {@link JAXBElement }{@code <}{@link ObjectIntType }{@code >}
      *     
      */
-    public JAXBElement<ObjectIntType> getPid() {
+    public ObjectIntType getPid() {
         return pid;
     }
 
@@ -110,7 +109,7 @@ public class ProcessenvironmentObject
      *     {@link JAXBElement }{@code <}{@link ObjectIntType }{@code >}
      *     
      */
-    public void setPid(JAXBElement<ObjectIntType> value) {
+    public void setPid(ObjectIntType value) {
         this.pid = value;
     }
 
